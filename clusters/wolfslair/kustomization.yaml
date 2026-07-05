@@ -3,6 +3,5 @@ kind: Kustomization
 resources:
   - flux-system
   - ../../base
-  - ../../infrastructure
-  - ../../apps/base
-  - ../../apps/n8n
+  - infra-kustomization.yaml
+  - apps-kustomization.yaml
