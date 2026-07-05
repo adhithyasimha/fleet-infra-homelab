@@ -21,6 +21,9 @@ spec:
           password: REDACTED
           database: n8n
     
+    image:
+      tag: latest
+
     primary:
       resources:
         requests:

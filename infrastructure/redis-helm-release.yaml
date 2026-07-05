@@ -17,6 +17,8 @@ spec:
     architecture: standalone
     auth:
       enabled: false
+    image:
+      tag: latest
     master:
       resources:
         requests:
