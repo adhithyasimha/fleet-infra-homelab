@@ -18,7 +18,7 @@ spec:
       postgresql:
         auth:
           username: n8n
-          password: changeme
+          existingSecret: postgres-db-credentials
           database: n8n
     
     primary:
