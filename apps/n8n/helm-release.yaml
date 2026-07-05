@@ -44,6 +44,12 @@ spec:
     # Main node configuration
     main:
       count: 1
+      startupProbe:
+        exec:
+          command: ["/bin/sh", "-c", "ps aux | grep '[n]8n'"]
+        initialDelaySeconds: 10
+        periodSeconds: 5
+        failureThreshold: 30
       resources:
         requests:
           cpu: 100m
