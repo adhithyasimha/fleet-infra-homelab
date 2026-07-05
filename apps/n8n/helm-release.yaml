@@ -60,6 +60,9 @@ spec:
         limits:
           cpu: 512m
           memory: 512Mi
+      extraEnvVars:
+        N8N_LISTEN_ADDRESS: "0.0.0.0"
+        NODE_ENV: production
     
     # Webhooks
     webhook:
@@ -76,9 +79,3 @@ spec:
         limits:
           cpu: 512m
           memory: 512Mi
-    
-    # Environment variables
-    main:
-      extraEnvVars:
-        N8N_LISTEN_ADDRESS: "0.0.0.0"
-        NODE_ENV: production
