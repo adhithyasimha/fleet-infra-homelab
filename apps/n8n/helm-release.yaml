@@ -48,7 +48,6 @@ spec:
           memory: 512Mi
       extraEnvVars:
         N8N_LISTEN_ADDRESS: "0.0.0.0"
-        NODE_ENV: production
     
     # Webhooks
     webhook:
