@@ -55,7 +55,7 @@ spec:
           cpu: 100m
           memory: 128Mi
         limits:
-          cpu: 1
+          cpu: "1"
           memory: 1Gi
       extraEnvVars:
         N8N_LISTEN_ADDRESS: "0.0.0.0"
