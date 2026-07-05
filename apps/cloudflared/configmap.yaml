@@ -1,0 +1,13 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+  namespace: apps
+data:
+  config.yml: |
+    tunnel: 88bd8740-b151-4e8a-8d19-6c44d0880775
+    credentials-file: /etc/cloudflared/creds.json
+    ingress:
+      - hostname: n8n.example.com
+        service: http://n8n.apps.svc.cluster.local:5678
+      - service: http_status:404
