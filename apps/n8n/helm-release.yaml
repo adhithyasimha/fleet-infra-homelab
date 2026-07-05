@@ -31,15 +31,6 @@ spec:
       host: redis-master.databases.svc.cluster.local
       port: 6379
 
-    config:
-      executions:
-        mode: queue
-      queue:
-        bull:
-          redis:
-            host: redis-master.databases.svc.cluster.local
-            port: 6379
-
     # Service configuration
     service:
       name: http
@@ -62,6 +53,9 @@ spec:
           memory: 512Mi
       extraEnvVars:
         N8N_LISTEN_ADDRESS: "0.0.0.0"
+        EXECUTIONS_MODE: queue
+        QUEUE_BULL_REDIS_HOST: redis-master.databases.svc.cluster.local
+        QUEUE_BULL_REDIS_PORT: "6379"
     
     # Webhooks
     webhook:
