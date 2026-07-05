@@ -5,7 +5,7 @@ metadata:
   namespace: apps
 data:
   config.yml: |
-    tunnel: b90c47eb-6f61-47e8-a48b-318242915246
+    tunnel: 00000000-0000-4000-8000-000000000000
     credentials-file: /etc/cloudflared/creds.json
     ingress:
       - hostname: n8n.example.com
