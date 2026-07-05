@@ -55,8 +55,8 @@ spec:
           cpu: 100m
           memory: 128Mi
         limits:
-          cpu: 512m
-          memory: 512Mi
+          cpu: 1
+          memory: 1Gi
       extraEnvVars:
         N8N_LISTEN_ADDRESS: "0.0.0.0"
         EXECUTIONS_MODE: queue
