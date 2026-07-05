@@ -10,4 +10,7 @@ data:
     ingress:
       - hostname: n8n.example.invalid
         service: http://n8n.apps.svc.cluster.local:5678
+      - hostname: rancher.example.invalid
+        service: http://traefik.traefik.svc.cluster.local:80
       - service: http_status:404
+
