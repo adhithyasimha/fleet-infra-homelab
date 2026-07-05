@@ -1,4 +1,4 @@
-# Fleet Infra - Traefik + n8n on Flux
+# Fleet Infra 
 
 Complete GitOps setup with Traefik Ingress, n8n automation, PostgreSQL, cert-manager TLS, and Sealed Secrets.
 
