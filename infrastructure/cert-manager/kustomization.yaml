@@ -4,3 +4,5 @@ resources:
   - jetstack-helm-repository.yaml
   - cert-manager-helm-release.yaml
   - letsencrypt-issuers.yaml
+commonAnnotations:
+  kustomize.toolkit.fluxcd.io/prune: disabled
