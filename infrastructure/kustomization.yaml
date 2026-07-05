@@ -7,3 +7,4 @@ resources:
   - helm-repositories.yaml
   - bitnami-helm-repository.yaml
   - postgres-helm-release.yaml
+  - redis-helm-release.yaml

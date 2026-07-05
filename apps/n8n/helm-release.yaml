@@ -26,6 +26,11 @@ spec:
       existingSecretPasswordKey: password
       database: n8n
     
+    # Redis configuration for webhook queue mode
+    externalRedis:
+      host: redis.databases.svc.cluster.local
+      port: 6379
+
     # Service configuration
     service:
       name: http
