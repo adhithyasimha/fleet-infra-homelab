@@ -8,7 +8,7 @@ spec:
   chart:
     spec:
       chart: postgresql
-      version: "15.x"
+      version: "16.x"
       sourceRef:
         kind: HelmRepository
         name: bitnami
@@ -21,9 +21,6 @@ spec:
           password: REDACTED
           database: n8n
     
-    image:
-      tag: 16.4.0-debian-12-r15
-
     primary:
       resources:
         requests:
