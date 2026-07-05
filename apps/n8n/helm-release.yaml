@@ -66,11 +66,9 @@ spec:
     # Webhooks
     webhook:
       mode: queue
-      count: 2
-      autoscaling:
-        enabled: true
-        minReplicas: 2
-        maxReplicas: 5
+      mcp:
+        enabled: false
+      count: 1
       resources:
         requests:
           cpu: 100m
