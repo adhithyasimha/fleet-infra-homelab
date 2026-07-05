@@ -41,14 +41,14 @@ spec:
         traefik.ingress.kubernetes.io/router.entrypoints: websecure
         traefik.ingress.kubernetes.io/router.tls: "true"
       hosts:
-        - host: n8n.example.com
+        - host: n8n.example.invalid
           paths:
             - path: /
               pathType: Prefix
       tls:
         - secretName: n8n-tls
           hosts:
-            - n8n.example.com
+            - n8n.example.invalid
     
     # Main node configuration
     main:
