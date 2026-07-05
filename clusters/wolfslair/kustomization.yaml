@@ -4,4 +4,5 @@ resources:
   - flux-system
   - ../../base
   - infra-kustomization.yaml
+  - cert-issuers-kustomization.yaml
   - apps-kustomization.yaml
