@@ -3,6 +3,7 @@ kind: Kustomization
 resources:
   - traefik
   - cert-manager
+  - cert-manager-issuers
   - sealedsecrets
   - helm-repositories.yaml
   - bitnami-helm-repository.yaml
