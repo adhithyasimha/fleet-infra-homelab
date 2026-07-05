@@ -1,0 +1,84 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: n8n
+  namespace: apps
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: n8n
+      version: "1.24.x"
+      sourceRef:
+        kind: HelmRepository
+        name: community-charts
+        namespace: flux-system
+  values:
+    # Database configuration
+    db:
+      type: postgresdb
+    
+    externalPostgresql:
+      host: postgres.databases.svc.cluster.local
+      port: 5432
+      username: n8n
+      existingSecret: postgres-credentials
+      existingSecretPasswordKey: password
+      database: n8n
+    
+    # Service configuration
+    service:
+      name: http
+      port: 5678
+      type: ClusterIP
+    
+    # Ingress with Traefik and cert-manager
+    ingress:
+      enabled: true
+      className: traefik
+      annotations:
+        cert-manager.io/cluster-issuer: letsencrypt-prod
+        traefik.ingress.kubernetes.io/router.entrypoints: websecure
+        traefik.ingress.kubernetes.io/router.tls: "true"
+      hosts:
+        - host: n8n.example.com
+          paths:
+            - path: /
+              pathType: Prefix
+      tls:
+        - secretName: n8n-tls
+          hosts:
+            - n8n.example.com
+    
+    # Main node configuration
+    main:
+      count: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 512m
+          memory: 512Mi
+    
+    # Webhooks
+    webhook:
+      mode: queue
+      count: 2
+      autoscaling:
+        enabled: true
+        minReplicas: 2
+        maxReplicas: 5
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 512m
+          memory: 512Mi
+    
+    # Environment variables
+    main:
+      extraEnvVars:
+        N8N_LISTEN_ADDRESS: "0.0.0.0"
+        NODE_ENV: production

@@ -1,0 +1,29 @@
+# Secrets and sensitive files
+sealing-key.yaml
+*.env
+*.env.local
+.env
+.env.*.local
+
+# Credentials
+credentials/
+secrets/
+*-secret.yaml
+
+# Generated files
+/tmp/
+*.out
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Build artifacts
+dist/
+build/
+
+# Kubeseal temp files
+.kubeseal/

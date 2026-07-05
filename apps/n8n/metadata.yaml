@@ -1,0 +1,8 @@
+name: n8n
+namespace: apps
+host: n8n.example.com
+service: n8n
+port: 5678
+path: /
+tls: true
+ingressClassName: traefik
