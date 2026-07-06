@@ -10,7 +10,7 @@ spec:
   imageName: ghcr.io/cloudnative-pg/postgresql:18-standard-trixie
   bootstrap:
     initdb:
-      name: immich
+      database: immich
       owner: immich
   postgresql:
     shared_preload_libraries:
