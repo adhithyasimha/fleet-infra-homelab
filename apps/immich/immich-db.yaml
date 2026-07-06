@@ -14,6 +14,7 @@ spec:
       owner: immich
       postInitSQL:
         - CREATE EXTENSION IF NOT EXISTS vector
+        - CREATE EXTENSION IF NOT EXISTS vchord CASCADE
   postgresql:
     shared_preload_libraries:
       - "vchord.so"
