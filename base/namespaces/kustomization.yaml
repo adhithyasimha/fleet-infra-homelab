@@ -5,3 +5,4 @@ resources:
   - databases.yaml
   - cert-manager.yaml
   - traefik.yaml
+  - cnpg-system.yaml
