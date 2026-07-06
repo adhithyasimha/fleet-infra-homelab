@@ -4,3 +4,5 @@ resources:
   - base
   - n8n
   - cloudflared
+  - immich
+  - immich

@@ -1,0 +1,61 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: immich
+  namespace: apps
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: immich
+      version: "0.13.x"
+      sourceRef:
+        kind: HelmRepository
+        name: immich
+        namespace: flux-system
+  values:
+    controllers:
+      main:
+        containers:
+          main:
+            image:
+              tag: v3.0.0
+            env:
+              REDIS_HOSTNAME: redis-master.databases.svc.cluster.local
+              DB_HOSTNAME: immich-db-rw
+              DB_USERNAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-db-app
+                    key: username
+              DB_PASSWORD:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-db-app
+                    key: password
+              DB_DATABASE_NAME:
+                valueFrom:
+                  secretKeyRef:
+                    name: immich-db-app
+                    key: dbname
+
+    immich:
+      metrics:
+        enabled: false
+      persistence:
+        library:
+          existingClaim: immich-library
+      configuration: {}
+      configurationKind: ConfigMap
+
+    valkey:
+      enabled: false
+
+    server:
+      enabled: true
+      ingress:
+        main:
+          enabled: false
+
+    machine-learning:
+      enabled: false

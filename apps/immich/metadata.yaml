@@ -1,0 +1,8 @@
+name: immich
+namespace: apps
+host: immich.example.com
+service: immich
+port: 2283
+path: /
+tls: true
+ingressClassName: traefik

@@ -12,5 +12,7 @@ data:
         service: http://n8n.apps.svc.cluster.local:5678
       - hostname: rancher.example.com
         service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: immich.example.com
+        service: http://immich.apps.svc.cluster.local:2283
       - service: http_status:404
 
