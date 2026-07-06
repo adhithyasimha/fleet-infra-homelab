@@ -9,7 +9,7 @@ spec:
     size: 10Gi
   imageName: ghcr.io/cloudnative-pg/postgresql:18-standard-trixie
   bootstrap:
-    initDB:
+    initdb:
       name: immich
       owner: immich
   postgresql:
