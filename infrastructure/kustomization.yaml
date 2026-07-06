@@ -4,7 +4,9 @@ resources:
   - traefik
   - cert-manager
   - sealedsecrets
+  - cloudnative-pg
   - helm-repositories.yaml
   - bitnami-helm-repository.yaml
+  - immich-helm-repository.yaml
   - postgres-helm-release.yaml
   - redis-helm-release.yaml
