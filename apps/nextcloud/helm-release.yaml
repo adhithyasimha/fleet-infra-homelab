@@ -44,9 +44,17 @@ spec:
       type: ClusterIP
       port: 8080
 
-    nginx:
-      config:
-        default: true
+    livenessProbe:
+      initialDelaySeconds: 180
+      timeoutSeconds: 10
+      periodSeconds: 30
+      failureThreshold: 6
+
+    readinessProbe:
+      initialDelaySeconds: 60
+      timeoutSeconds: 10
+      periodSeconds: 30
+      failureThreshold: 6
 
     resources:
       requests:
