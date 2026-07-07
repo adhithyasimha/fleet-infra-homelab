@@ -10,3 +10,6 @@ resources:
   - immich-helm-repository.yaml
   - postgres-helm-release.yaml
   - redis-helm-release.yaml
+  - nextcloud-helm-repository.yaml
+  - postgres-nextcloud-helm-release.yaml
+  - nextcloud-postgres-sealed.yaml
