@@ -9,11 +9,23 @@ data:
     credentials-file: /etc/cloudflared/creds.json
     ingress:
       - hostname: n8n.example.com
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: n8n.example.com
         service: http://n8n.apps.svc.cluster.local:5678
+      - hostname: rancher.example.com
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.traefik.svc.cluster.local:80
       - hostname: rancher.example.com
         service: http://traefik.traefik.svc.cluster.local:80
       - hostname: immich.example.com
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: immich.example.com
         service: http://immich-server.apps.svc.cluster.local:2283
+      - hostname: nextcloud.example.com
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.traefik.svc.cluster.local:80
       - hostname: nextcloud.example.com
         service: http://nextcloud.apps.svc.cluster.local:8080
       - service: http_status:404
