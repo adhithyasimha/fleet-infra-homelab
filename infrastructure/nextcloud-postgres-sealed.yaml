@@ -1,0 +1,13 @@
+---
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: nextcloud-postgres
+  namespace: databases
+spec:
+  encryptedData:
+    password: AgBHweMmmjd1oV0jkGAEavZzQQr338TQpA7UVdrFMluhV+HlLS0Li57s0drelVGmOuEI2W20q0GMUUZ84M3sYOLdjKfUwDJP37nnD1eU+e1LcgDt3qxKUnAOah59g2EMDC71jx03rvGcwPyqfP2qYvmQJhnmcpMp7xKcF62mJrijADBLJo61rYWmVW+X271JZhQGutrZO4A2ECAAkuV8xKGJiOxlPUk6GBGh+YW1Tkb9sDr8GqnrTc2KmFyiTjDBwW9fJ5+Yv3pHzgnmnGVqHWvSGAaWVWeDY+czMUHQUoSBKZWuBZzzNuUuKfCkuypcgud0d4sPSpD7HkJYZVPrzkfwoEthF9ggzFl0OrsT9tQQZ5fnegAbXDHcEfq2RjTCM7Olg4eBcZObY72cCgDzrZf//Z9WOu6YI/BxcJCJMPjba/EEbxobiFYCvHD9kR6NXOn3mbhbzlDzvCmPkrSdDpEgCLBhMX9EEKiTQ0O8tiUlhU6yU8Ov0+hsDp44AsSWEZYA5PBdfhvNUmsWVwViH17TQ+tOAuHYyqlpvaYVG0vATwGFEeMn00tFjgEzS2MSZoFG0wPK01dGTttH4zitrC06fG0o0BvNjSpNLyphADllaQScDgnfUuSxnVkbrcmHVhovrHdyqT3Twy2QG7H6cK97CEKdMhtgv1/axHBiaia4ZpXYbLAhaLChVSpeaQIJ5ix9eMInk8BBSHn3pyW9aDK/KYwogg==
+  template:
+    metadata:
+      name: nextcloud-postgres
+      namespace: databases

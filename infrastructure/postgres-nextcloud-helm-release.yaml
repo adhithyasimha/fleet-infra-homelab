@@ -1,0 +1,39 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: postgres-nextcloud
+  namespace: databases
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: postgresql
+      version: "16.x"
+      sourceRef:
+        kind: HelmRepository
+        name: bitnami
+        namespace: flux-system
+  values:
+    global:
+      postgresql:
+        auth:
+          username: nextcloud
+          database: nextcloud
+          existingSecret: nextcloud-postgres
+
+    architecture: standalone
+
+    image:
+      tag: latest
+
+    primary:
+      resources:
+        requests:
+          cpu: 100m
+          memory: 128Mi
+        limits:
+          cpu: 500m
+          memory: 512Mi
+      persistence:
+        enabled: true
+        size: 2Gi

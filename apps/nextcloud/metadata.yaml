@@ -1,0 +1,8 @@
+name: nextcloud
+namespace: apps
+host: nextcloud.example.com
+service: nextcloud
+port: 8080
+path: /
+tls: true
+ingressClassName: traefik

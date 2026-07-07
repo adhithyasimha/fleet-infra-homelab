@@ -14,5 +14,7 @@ data:
         service: http://traefik.traefik.svc.cluster.local:80
       - hostname: immich.example.com
         service: http://immich-server.apps.svc.cluster.local:2283
+      - hostname: nextcloud.example.com
+        service: http://nextcloud.apps.svc.cluster.local:8080
       - service: http_status:404
 

@@ -1,0 +1,57 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: nextcloud
+  namespace: apps
+spec:
+  interval: 1h
+  dependsOn:
+    - name: postgres-nextcloud
+      namespace: databases
+  chart:
+    spec:
+      chart: nextcloud
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: nextcloud
+        namespace: flux-system
+  values:
+    nextcloud:
+      host: nextcloud.example.com
+      trustedDomains:
+        - nextcloud.example.com
+
+    internalDatabase:
+      enabled: false
+
+    externalDatabase:
+      enabled: true
+      type: postgresql
+      host: postgres-nextcloud-postgresql.databases.svc.cluster.local:5432
+      database: nextcloud
+      user: nextcloud
+      password: REDACTED
+
+    persistence:
+      enabled: true
+      size: 100Gi
+
+    ingress:
+      enabled: false
+
+    service:
+      type: ClusterIP
+      port: 8080
+
+    nginx:
+      config:
+        default: true
+
+    resources:
+      requests:
+        cpu: 100m
+        memory: 256Mi
+      limits:
+        cpu: "1"
+        memory: 1Gi
