@@ -18,6 +18,11 @@ clusters/wolfslair/
   │   ├── sealedsecrets/
   │   │   ├── sealedsecrets-helm-repository.yaml
   │   │   └── sealed-secrets-helm-release.yaml
+  │   ├── authentik/
+  │   │   ├── authentik-helm-repository.yaml
+  │   │   ├── authentik-db.yaml (CNPG cluster)
+  │   │   ├── authentik-helm-release.yaml
+  │   │   └── authentik-config-sealed.example.yaml
   │   ├── postgres-helm-release.yaml
   │   └── helm-repositories.yaml
   └── apps/
@@ -106,6 +111,60 @@ flux get helmrelease --all-namespaces --watch
 - Bitnami chart in databases namespace
 - 10Gi storage (edit for production)
 - Credentials passed as sealed secret
+
+### Authentik (infrastructure/authentik)
+- Identity provider (SSO + LDAP directory) for all services
+- Postgres via CloudNativePG (authentik-db), Redis reused from databases namespace
+- Managed LDAP/Proxy outposts deployed into the cluster automatically (Kubernetes integration)
+- Admin UI at auth.example.com (change host in `authentik-helm-release.yaml`)
+
+## Authentik / LDAP setup (first run)
+
+### 1. Before deploying: seal the bootstrap admin secret
+The chart requires a sealed secret `authentik-config` in the `authentik` namespace
+(secret key + bootstrap admin credentials). Without it, Authentik won't start.
+
+```bash
+kubectl create secret generic authentik-config \
+  --from-literal=AUTHENTIK_SECRET_KEY="$(openssl rand -hex 32)" \
+  --from-literal=AUTHENTIK_BOOTSTRAP_ADMIN_EMAIL="admin@example.com" \
+  --from-literal=AUTHENTIK_BOOTSTRAP_ADMIN_PASSWORD="YourSecurePasswordHere" \
+  -n authentik --dry-run=client -o yaml > /tmp/authentik-config.yaml
+
+kubeseal -f /tmp/authentik-config.yaml \
+  -w infrastructure/authentik/authentik-config-sealed.yaml
+
+# Uncomment in infrastructure/authentik/kustomization.yaml:
+# - authentik-config-sealed.yaml
+```
+
+Push to git; Flux deploys Authentik. Log in at `https://auth.example.com` with
+`akadmin` / your password.
+
+### 2. Enable the LDAP server (one-time, in the Admin UI)
+1. **Providers**: Applications → Providers → Create → **LDAP Provider**
+   - Base DN: `DC=ldap,DC=wolfslair,DC=cloud`
+2. **Application**: Applications → Applications → Create → name it `LDAP`, select the LDAP provider
+3. **Outpost**: Applications → Outposts → Create
+   - Name: `ldap`, Type: **LDAP**, Integration: **Kubernetes**, select the LDAP application
+   - Authentik auto-deploys the LDAP outpost into the cluster (`ghcr.io/goauthentik/ldap`)
+4. **Service accounts** for each service: Directory → Users → Create (e.g. `svc-nextcloud`)
+   - These are the "bind users" services authenticate against the directory with
+
+### 3. Point services at the LDAP server
+All services (in-cluster) connect to the outpost service:
+
+```
+ldap://ak-outpost-ldap.authentik.svc.cluster.local:389
+ldaps://ak-outpost-ldap.authentik.svc.cluster.local:636   (if enabled)
+
+Base DN:  DC=ldap,DC=wolfslair,DC=cloud
+Bind DN:  cn=svc-<service>,ou=users,DC=ldap,DC=wolfslair,DC=cloud
+```
+
+> Most apps (Nextcloud, n8n, Immich...) also support **OIDC** — use the
+> OIDC provider in Authentik instead of LDAP where possible. LDAP stays
+> available for anything that only speaks LDAP.
 
 ## Configuration
 

@@ -1,0 +1,80 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: authentik
+  namespace: authentik
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: authentik
+      version: "2026.5.x"
+      sourceRef:
+        kind: HelmRepository
+        name: authentik
+        namespace: flux-system
+  dependsOn:
+    - name: cloudnative-pg
+      namespace: cnpg-system
+  values:
+    global:
+      env:
+        - name: AUTHENTIK_POSTGRESQL__HOST
+          value: authentik-db-rw.authentik.svc.cluster.local
+        - name: AUTHENTIK_POSTGRESQL__USER
+          valueFrom:
+            secretKeyRef:
+              name: authentik-db-app
+              key: username
+        - name: AUTHENTIK_POSTGRESQL__PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: authentik-db-app
+              key: password
+        - name: AUTHENTIK_POSTGRESQL__NAME
+          valueFrom:
+            secretKeyRef:
+              name: authentik-db-app
+              key: dbname
+        - name: AUTHENTIK_REDIS__HOST
+          value: redis-master.databases.svc.cluster.local
+
+    authentik:
+      error_reporting:
+        enabled: false
+
+    postgresql:
+      enabled: false
+
+    server:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 1Gi
+      ingress:
+        enabled: true
+        ingressClassName: traefik
+        annotations:
+          cert-manager.io/cluster-issuer: letsencrypt-prod
+          traefik.ingress.kubernetes.io/router.entrypoints: websecure
+          traefik.ingress.kubernetes.io/router.tls: "true"
+        hosts:
+          - auth.example.com
+        tls:
+          - secretName: authentik-tls
+            hosts:
+              - auth.example.com
+
+    worker:
+      replicas: 1
+      resources:
+        requests:
+          cpu: 100m
+          memory: 256Mi
+        limits:
+          cpu: 500m
+          memory: 1Gi
