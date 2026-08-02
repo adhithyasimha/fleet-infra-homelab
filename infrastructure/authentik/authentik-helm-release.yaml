@@ -38,6 +38,11 @@ spec:
               key: dbname
         - name: AUTHENTIK_REDIS__HOST
           value: redis-master.databases.svc.cluster.local
+        - name: AUTHENTIK_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: authentik-config
+              key: AUTHENTIK_SECRET_KEY
 
     authentik:
       error_reporting:
