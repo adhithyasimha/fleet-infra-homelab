@@ -11,5 +11,6 @@ resources:
   - postgres-helm-release.yaml
   - redis-helm-release.yaml
   - nextcloud-helm-repository.yaml
+  - jellyfin-helm-repository.yaml
   - postgres-nextcloud-helm-release.yaml
   - nextcloud-postgres-sealed.yaml
