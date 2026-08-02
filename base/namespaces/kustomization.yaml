@@ -6,3 +6,4 @@ resources:
   - cert-manager.yaml
   - traefik.yaml
   - cnpg-system.yaml
+  - authentik.yaml

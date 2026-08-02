@@ -5,6 +5,7 @@ resources:
   - cert-manager
   - sealedsecrets
   - cloudnative-pg
+  - authentik
   - helm-repositories.yaml
   - bitnami-helm-repository.yaml
   - immich-helm-repository.yaml
