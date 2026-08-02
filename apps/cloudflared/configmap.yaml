@@ -28,5 +28,10 @@ data:
         service: http://traefik.traefik.svc.cluster.local:80
       - hostname: nextcloud.example.com
         service: http://nextcloud.apps.svc.cluster.local:8080
+      - hostname: auth.example.com
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.traefik.svc.cluster.local:80
+      - hostname: auth.example.com
+        service: http://authentik-server.authentik.svc.cluster.local:80
       - service: http_status:404
 
