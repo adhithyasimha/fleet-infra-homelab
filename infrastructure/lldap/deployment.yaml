@@ -33,16 +33,16 @@ spec:
                   name: lldap-config
                   key: ldap-user-pass
             - name: LLDAP_JWT_SECRET_FILE
-              value: /run/secrets/jwt-secret
+              value: /etc/lldap-secrets/jwt-secret
             - name: LLDAP_KEY_SEED_FILE
-              value: /run/secrets/key-seed
+              value: /etc/lldap-secrets/key-seed
             - name: LLDAP_HTTP_URL
               value: https://lldap.example.com
           volumeMounts:
             - name: data
               mountPath: /data
             - name: config
-              mountPath: /run/secrets
+              mountPath: /etc/lldap-secrets
               readOnly: true
           readinessProbe:
             httpGet:
