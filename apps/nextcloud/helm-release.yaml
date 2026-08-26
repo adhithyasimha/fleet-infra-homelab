@@ -21,6 +21,7 @@ spec:
       host: nextcloud.example.invalid
       trustedDomains:
         - nextcloud.example.invalid
+        - backroom.example.invalid
 
     internalDatabase:
       enabled: false
