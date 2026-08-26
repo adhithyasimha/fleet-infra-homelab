@@ -21,6 +21,7 @@ spec:
       host: nextcloud.example.com
       trustedDomains:
         - nextcloud.example.com
+        - backroom.example.com
 
     internalDatabase:
       enabled: false

@@ -28,6 +28,11 @@ data:
         service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: nextcloud.example.com
         service: http://nextcloud.apps.svc.cluster.local:8080
+      - hostname: backroom.example.com
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: backroom.example.com
+        service: http://nextcloud.apps.svc.cluster.local:8080
       - hostname: lldap.example.com
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80

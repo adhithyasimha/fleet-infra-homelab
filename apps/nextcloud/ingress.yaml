@@ -12,9 +12,20 @@ spec:
   tls:
     - hosts:
         - nextcloud.example.com
+        - backroom.example.com
       secretName: nextcloud-tls
   rules:
     - host: nextcloud.example.com
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: nextcloud
+                port:
+                  number: 8080
+    - host: backroom.example.com
       http:
         paths:
           - path: /
