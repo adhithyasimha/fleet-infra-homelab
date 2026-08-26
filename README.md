@@ -1,6 +1,6 @@
 # Fleet Infra 
 
-Complete GitOps setup with Traefik Ingress, n8n automation, PostgreSQL, cert-manager TLS, and Sealed Secrets.
+Complete GitOps setup with Traefik Ingress, n8n automation, PostgreSQL, cert-manager TLS, Sealed Secrets, and lightweight LDAP.
 
 ## Architecture
 
@@ -18,11 +18,11 @@ clusters/wolfslair/
   │   ├── sealedsecrets/
   │   │   ├── sealedsecrets-helm-repository.yaml
   │   │   └── sealed-secrets-helm-release.yaml
-  │   ├── authentik/
-  │   │   ├── authentik-helm-repository.yaml
-  │   │   ├── authentik-db.yaml (CNPG cluster)
-  │   │   ├── authentik-helm-release.yaml
-  │   │   └── authentik-config-sealed.example.yaml
+   │   ├── lldap/
+   │   │   ├── deployment.yaml
+   │   │   ├── service.yaml
+   │   │   ├── pvc.yaml
+   │   │   └── ingress.yaml
   │   ├── postgres-helm-release.yaml
   │   └── helm-repositories.yaml
   └── apps/
@@ -112,59 +112,46 @@ flux get helmrelease --all-namespaces --watch
 - 10Gi storage (edit for production)
 - Credentials passed as sealed secret
 
-### Authentik (infrastructure/authentik)
-- Identity provider (SSO + LDAP directory) for all services
-- Postgres via CloudNativePG (authentik-db), Redis reused from databases namespace
-- Managed LDAP/Proxy outposts deployed into the cluster automatically (Kubernetes integration)
-- Admin UI at auth.example.com (change host in `authentik-helm-release.yaml`)
+### LLDAP (infrastructure/lldap)
+- Lightweight LDAP server with SQLite-backed persistent storage
+- Internal LDAP service at `lldap.lldap.svc.cluster.local:3890`
+- Admin UI at `https://lldap.example.com`
+- LDAP is not exposed outside the cluster; only the HTTPS admin UI is routed through Traefik
 
-## Authentik / LDAP setup (first run)
+## LLDAP setup (first run)
 
-### 1. Before deploying: seal the bootstrap admin secret
-The chart requires a sealed secret `authentik-config` in the `authentik` namespace
-(secret key + bootstrap admin credentials). Without it, Authentik won't start.
+### 1. Seal the bootstrap secret
+LLDAP requires an admin password plus stable signing/key-seed secrets. Create them locally:
 
 ```bash
-kubectl create secret generic authentik-config \
-  --from-literal=AUTHENTIK_SECRET_KEY="$(openssl rand -hex 32)" \
-  --from-literal=AUTHENTIK_BOOTSTRAP_ADMIN_EMAIL="admin@example.com" \
-  --from-literal=AUTHENTIK_BOOTSTRAP_ADMIN_PASSWORD="YourSecurePasswordHere" \
-  -n authentik --dry-run=client -o yaml > /tmp/authentik-config.yaml
+kubectl create secret generic lldap-config \
+   --from-literal=ldap-user-pass='YourSecurePasswordHere' \
+   --from-literal=jwt-secret="$(openssl rand -hex 32)" \
+   --from-literal=key-seed="$(openssl rand -hex 32)" \
+   -n lldap --dry-run=client -o yaml > /tmp/lldap-config.yaml
 
-kubeseal -f /tmp/authentik-config.yaml \
-  -w infrastructure/authentik/authentik-config-sealed.yaml
-
-# Uncomment in infrastructure/authentik/kustomization.yaml:
-# - authentik-config-sealed.yaml
+kubeseal -f /tmp/lldap-config.yaml \
+   -w infrastructure/lldap/lldap-config-sealed.yaml
 ```
 
-Push to git; Flux deploys Authentik. Log in at `https://auth.example.com` with
-`akadmin` / your password.
+Add the generated file to `infrastructure/lldap/kustomization.yaml`, then push it.
+Flux will deploy LLDAP. Log in at `https://lldap.example.com` with `admin` and
+the password you chose.
 
-### 2. Enable the LDAP server (one-time, in the Admin UI)
-1. **Providers**: Applications → Providers → Create → **LDAP Provider**
-   - Base DN: `DC=ldap,DC=wolfslair,DC=cloud`
-2. **Application**: Applications → Applications → Create → name it `LDAP`, select the LDAP provider
-3. **Outpost**: Applications → Outposts → Create
-   - Name: `ldap`, Type: **LDAP**, Integration: **Kubernetes**, select the LDAP application
-   - Authentik auto-deploys the LDAP outpost into the cluster (`ghcr.io/goauthentik/ldap`)
-4. **Service accounts** for each service: Directory → Users → Create (e.g. `svc-nextcloud`)
-   - These are the "bind users" services authenticate against the directory with
-
-### 3. Point services at the LDAP server
-All services (in-cluster) connect to the outpost service:
+### 2. Point services at LLDAP
+Services in the cluster connect directly to:
 
 ```
-ldap://ak-outpost-ldap.authentik.svc.cluster.local:389
-ldaps://ak-outpost-ldap.authentik.svc.cluster.local:636   (if enabled)
+ldap://lldap.lldap.svc.cluster.local:3890
 
-Base DN:  DC=ldap,DC=wolfslair,DC=cloud
-Bind DN:  cn=svc-<service>,ou=users,DC=ldap,DC=wolfslair,DC=cloud
+Base DN:  dc=wolfslair,dc=cloud
+Users:    ou=people,dc=wolfslair,dc=cloud
+Groups:   ou=groups,dc=wolfslair,dc=cloud
 ```
 
-> Most apps (Nextcloud, n8n, Immich...) also support **OIDC** — use the
-> OIDC provider in Authentik instead of LDAP where possible. LDAP stays
-> available for anything that only speaks LDAP.
+Create a separate read-only bind user for each service instead of sharing the
+LLDAP administrator account. Nextcloud and Rancher can then be configured to
+use this LDAP endpoint in their respective administration interfaces.
 
 ## Configuration
 

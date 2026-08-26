@@ -1,0 +1,77 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: lldap
+  namespace: lldap
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: lldap
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: lldap
+    spec:
+      containers:
+        - name: lldap
+          image: ghcr.io/lldap/lldap:v0.6.3
+          imagePullPolicy: IfNotPresent
+          ports:
+            - name: ldap
+              containerPort: 3890
+            - name: http
+              containerPort: 17170
+          env:
+            - name: LLDAP_LDAP_BASE_DN
+              value: dc=wolfslair,dc=cloud
+            - name: LLDAP_LDAP_USER_DN
+              value: admin
+            - name: LLDAP_LDAP_USER_PASS
+              valueFrom:
+                secretKeyRef:
+                  name: lldap-config
+                  key: ldap-user-pass
+            - name: LLDAP_JWT_SECRET_FILE
+              value: /run/secrets/jwt-secret
+            - name: LLDAP_KEY_SEED_FILE
+              value: /run/secrets/key-seed
+            - name: LLDAP_HTTP_URL
+              value: https://lldap.example.com
+          volumeMounts:
+            - name: data
+              mountPath: /data
+            - name: config
+              mountPath: /run/secrets
+              readOnly: true
+          readinessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 10
+            periodSeconds: 10
+          livenessProbe:
+            httpGet:
+              path: /
+              port: http
+            initialDelaySeconds: 30
+            periodSeconds: 20
+          resources:
+            requests:
+              cpu: 10m
+              memory: 64Mi
+            limits:
+              cpu: 250m
+              memory: 256Mi
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: lldap-data
+        - name: config
+          secret:
+            secretName: lldap-config
+            items:
+              - key: jwt-secret
+                path: jwt-secret
+              - key: key-seed
+                path: key-seed

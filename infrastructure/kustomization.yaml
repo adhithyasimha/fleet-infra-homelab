@@ -4,7 +4,7 @@ resources:
   - cert-manager
   - sealedsecrets
   - cloudnative-pg
-  - authentik
+  - lldap
   - helm-repositories.yaml
   - bitnami-helm-repository.yaml
   - immich-helm-repository.yaml
