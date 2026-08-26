@@ -32,11 +32,10 @@ data:
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: lldap.example.invalid
-        service: http://traefik.kube-system.svc.cluster.local:80
+        service: http://lldap.lldap.svc.cluster.local:17170
       - hostname: jellyfin.example.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: jellyfin.example.invalid
         service: http://jellyfin.apps.svc.cluster.local:8096
       - service: http_status:404
-
