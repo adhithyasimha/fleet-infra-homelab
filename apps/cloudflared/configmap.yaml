@@ -28,11 +28,11 @@ data:
         service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: nextcloud.example.invalid
         service: http://nextcloud.apps.svc.cluster.local:8080
-      - hostname: auth.example.invalid
+      - hostname: lldap.example.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: auth.example.invalid
-        service: http://authentik-server.authentik.svc.cluster.local:80
+      - hostname: lldap.example.invalid
+        service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: jellyfin.example.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
