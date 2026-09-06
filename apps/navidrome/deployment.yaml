@@ -30,7 +30,7 @@ spec:
             - name: ND_PORT
               value: "4533"
             - name: ND_BASEURL
-              value: https://navidrome.example.invalid
+              value: https://music.example.invalid
           ports:
             - name: http
               containerPort: 4533

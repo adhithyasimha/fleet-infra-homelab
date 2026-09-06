@@ -1,6 +1,6 @@
 name: navidrome
 namespace: apps
-host: navidrome.example.invalid
+host: music.example.invalid
 service: navidrome
 port: 4533
 path: /
