@@ -43,4 +43,9 @@ data:
         service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: jellyfin.example.com
         service: http://jellyfin.apps.svc.cluster.local:8096
+      - hostname: youtube.example.com
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: youtube.example.com
+        service: http://invidious.apps.svc.cluster.local:3000
       - service: http_status:404
