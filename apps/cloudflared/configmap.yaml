@@ -53,4 +53,9 @@ data:
         service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: music.example.com
         service: http://navidrome.apps.svc.cluster.local:4533
+      - hostname: downloads.example.com
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: downloads.example.com
+        service: http://qbittorrent.apps.svc.cluster.local:8080
       - service: http_status:404
