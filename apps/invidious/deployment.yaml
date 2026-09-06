@@ -108,7 +108,7 @@ spec:
             - -ec
           args:
             - |
-              export INVIDIOUS_CONFIG="$(printf 'db:\n  dbname: invidious\n  user: %s\n  password: %s\n  host: invidious-db-rw.apps.svc.cluster.local\n  port: 5432\ncheck_tables: true\ninvidious_companion:\n  - private_url: http://invidious-companion.apps.svc.cluster.local:8282/companion\ninvidious_companion_key: %s\ndomain: youtube.example.com\nexternal_port: 443\nhttps_only: true\nhmac_key: %s\n' "$DB_USER" "$DB_PASSWORD" "$COMPANION_KEY" "$HMAC_KEY")"
+              export INVIDIOUS_CONFIG="$(printf 'db:\n  dbname: invidious\n  user: %s\n  password: %s\n  host: invidious-db-rw.apps.svc.cluster.local\n  port: 5432\ncheck_tables: true\ninvidious_companion:\n  - private_url: http://invidious-companion.apps.svc.cluster.local:8282/companion\ninvidious_companion_key: %s\ndomain: youtube.example.com\nexternal_port: 443\nhttps_only: true\ncaptcha_enabled: false\nhmac_key: %s\n' "$DB_USER" "$DB_PASSWORD" "$COMPANION_KEY" "$HMAC_KEY")"
               exec /invidious/invidious
           env:
             - name: INVIDIOUS_PORT
