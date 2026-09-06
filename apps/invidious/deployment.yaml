@@ -13,6 +13,7 @@ spec:
       labels:
         app: invidious-companion
     spec:
+      enableServiceLinks: false
       securityContext:
         fsGroup: 10001
         seccompProfile:
@@ -70,6 +71,7 @@ spec:
       labels:
         app: invidious
     spec:
+      enableServiceLinks: false
       initContainers:
         - name: migrate-database
           image: quay.io/invidious/invidious:latest
