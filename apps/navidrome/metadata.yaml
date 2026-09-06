@@ -1,0 +1,8 @@
+name: navidrome
+namespace: apps
+host: navidrome.example.invalid
+service: navidrome
+port: 4533
+path: /
+tls: true
+ingressClassName: traefik
