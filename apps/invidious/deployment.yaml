@@ -83,6 +83,8 @@ spec:
               export INVIDIOUS_CONFIG="$(printf 'db:\n  dbname: invidious\n  user: %s\n  password: %s\n  host: invidious-db-rw.apps.svc.cluster.local\n  port: 5432\n' "$DB_USER" "$DB_PASSWORD")"
               exec /invidious/invidious --migrate
           env:
+            - name: INVIDIOUS_PORT
+              value: "3000"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
@@ -104,6 +106,8 @@ spec:
               export INVIDIOUS_CONFIG="$(printf 'db:\n  dbname: invidious\n  user: %s\n  password: %s\n  host: invidious-db-rw.apps.svc.cluster.local\n  port: 5432\ncheck_tables: true\ninvidious_companion:\n  - private_url: http://invidious-companion.apps.svc.cluster.local:8282/companion\ninvidious_companion_key: %s\ndomain: youtube.example.com\nexternal_port: 443\nhttps_only: true\nhmac_key: %s\n' "$DB_USER" "$DB_PASSWORD" "$COMPANION_KEY" "$HMAC_KEY")"
               exec /invidious/invidious
           env:
+            - name: INVIDIOUS_PORT
+              value: "3000"
             - name: DB_USER
               valueFrom:
                 secretKeyRef:
