@@ -22,7 +22,7 @@ spec:
           command:
             - sh
             - -c
-            - mkdir -p /media/movies && chown 1000:1000 /media/movies
+            - mkdir -p /media/Movies && chown 1000:1000 /media/Movies
           volumeMounts:
             - name: media
               mountPath: /media
@@ -71,7 +71,7 @@ spec:
               mountPath: /config
             - name: media
               mountPath: /downloads
-              subPath: movies
+              subPath: Movies
       volumes:
         - name: config
           persistentVolumeClaim:
