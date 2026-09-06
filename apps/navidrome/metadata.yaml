@@ -1,6 +1,6 @@
 name: navidrome
 namespace: apps
-host: navidrome.example.com
+host: music.example.com
 service: navidrome
 port: 4533
 path: /

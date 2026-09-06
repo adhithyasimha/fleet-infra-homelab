@@ -48,9 +48,9 @@ data:
         service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: youtube.example.com
         service: http://invidious.apps.svc.cluster.local:3000
-      - hostname: navidrome.example.com
+      - hostname: music.example.com
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: navidrome.example.com
+      - hostname: music.example.com
         service: http://navidrome.apps.svc.cluster.local:4533
       - service: http_status:404

@@ -11,10 +11,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - navidrome.example.com
+        - music.example.com
       secretName: navidrome-tls
   rules:
-    - host: navidrome.example.com
+    - host: music.example.com
       http:
         paths:
           - path: /
