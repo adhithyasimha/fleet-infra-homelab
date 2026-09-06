@@ -16,6 +16,16 @@ spec:
         app: qbittorrent
     spec:
       enableServiceLinks: false
+      initContainers:
+        - name: create-movies-directory
+          image: busybox:1.37
+          command:
+            - sh
+            - -c
+            - mkdir -p /media/movies && chown 1000:1000 /media/movies
+          volumeMounts:
+            - name: media
+              mountPath: /media
       containers:
         - name: qbittorrent
           image: lscr.io/linuxserver/qbittorrent:latest
@@ -59,12 +69,13 @@ spec:
           volumeMounts:
             - name: config
               mountPath: /config
-            - name: downloads
+            - name: media
               mountPath: /downloads
+              subPath: movies
       volumes:
         - name: config
           persistentVolumeClaim:
             claimName: qbittorrent-config
-        - name: downloads
+        - name: media
           persistentVolumeClaim:
-            claimName: qbittorrent-downloads
+            claimName: jellyfin-media
