@@ -80,7 +80,7 @@ spec:
             - -ec
           args:
             - |
-              export INVIDIOUS_CONFIG="$(printf 'db:\n  dbname: invidious\n  user: %s\n  password: %s\n  host: invidious-db-rw.apps.svc.cluster.local\n  port: 5432\n' "$DB_USER" "$DB_PASSWORD")"
+              export INVIDIOUS_CONFIG="$(printf 'db:\n  dbname: invidious\n  user: %s\n  password: %s\n  host: invidious-db-rw.apps.svc.cluster.local\n  port: 5432\nhmac_key: %s\n' "$DB_USER" "$DB_PASSWORD" "$HMAC_KEY")"
               exec /invidious/invidious --migrate
           env:
             - name: INVIDIOUS_PORT
@@ -95,6 +95,11 @@ spec:
                 secretKeyRef:
                   name: invidious-db-app
                   key: password
+            - name: HMAC_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: invidious-secrets
+                  key: hmac-key
       containers:
         - name: invidious
           image: quay.io/invidious/invidious:latest
