@@ -118,28 +118,6 @@ flux get helmrelease --all-namespaces --watch
 - Admin UI at `https://lldap.example.com`
 - LDAP is not exposed outside the cluster; only the HTTPS admin UI is routed through Traefik
 
-### Invidious (apps/invidious)
-- Invidious with the required Invidious Companion and a dedicated CloudNativePG database
-- Public URL at `https://youtube.example.com`
-- Routed through both Traefik/cert-manager and the existing Cloudflare Tunnel
-
-Before the first Flux reconciliation, create the application keys and seal them:
-
-```bash
-kubectl create secret generic invidious-secrets \
-  --namespace apps \
-  --from-literal=companion-key="$(openssl rand -hex 8)" \
-  --from-literal=hmac-key="$(openssl rand -hex 32)" \
-  --dry-run=client -o yaml > /tmp/invidious-secrets.yaml
-
-kubeseal -f /tmp/invidious-secrets.yaml \
-  -w apps/invidious/invidious-secrets-sealed.yaml
-```
-
-Then uncomment `invidious-secrets-sealed.yaml` in
-`apps/invidious/kustomization.yaml`. The companion key is deliberately exactly
-16 characters, as required by Invidious.
-
 ## LLDAP setup (first run)
 
 ### 1. Seal the bootstrap secret
