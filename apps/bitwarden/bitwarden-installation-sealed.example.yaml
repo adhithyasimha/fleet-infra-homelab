@@ -1,0 +1,25 @@
+# Do not commit Bitwarden installation credentials in plaintext.
+#
+# Obtain the installation ID and key from https://bitwarden.com/host/, then run:
+# kubectl create secret generic bitwarden-installation \
+#   --namespace apps \
+#   --from-literal=installation-id='YOUR_INSTALLATION_ID' \
+#   --from-literal=installation-key='YOUR_INSTALLATION_KEY' \
+#   --dry-run=client -o yaml > /tmp/bitwarden-installation.yaml
+# kubeseal -f /tmp/bitwarden-installation.yaml \
+#   -w apps/bitwarden/bitwarden-installation-sealed.yaml
+#
+# Finally uncomment bitwarden-installation-sealed.yaml in kustomization.yaml.
+apiVersion: bitnami.com/v1alpha1
+kind: SealedSecret
+metadata:
+  name: bitwarden-installation
+  namespace: apps
+spec:
+  encryptedData:
+    installation-id: REPLACE_WITH_KUBESEAL_OUTPUT
+    installation-key: REPLACE_WITH_KUBESEAL_OUTPUT
+  template:
+    metadata:
+      name: bitwarden-installation
+      namespace: apps

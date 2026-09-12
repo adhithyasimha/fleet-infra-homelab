@@ -126,6 +126,12 @@ flux get helmrelease --all-namespaces --watch
 - Cloudflare Access must protect the hostname before the first use; see the
   setup section below
 
+### Bitwarden Lite (apps/bitwarden)
+- Official Bitwarden single-container deployment at `https://vault.example.com`
+- Persistent SQLite vault data
+- Cloudflare Access is required before the public hostname is enabled
+- The Bitwarden installation ID and key are stored only in a sealed secret
+
 ## LLDAP setup (first run)
 
 ### 1. Seal the bootstrap secret
@@ -181,6 +187,23 @@ The Cloudflare Access policy is intentionally not stored in this repository:
 it is account-level configuration managed by Cloudflare Zero Trust. The tunnel
 route in `apps/cloudflared/configmap.yaml` only connects the protected hostname
 to the private in-cluster service.
+
+## Bitwarden setup (first run)
+
+1. Create a Cloudflare Zero Trust **Self-hosted** Access application for
+   `vault.example.com`, limited to your identity. Do this before pushing the
+   public tunnel route.
+2. Retrieve an installation ID and key from `https://bitwarden.com/host/`.
+   Follow the commands in
+   `apps/bitwarden/bitwarden-installation-sealed.example.yaml` to create
+   `bitwarden-installation-sealed.yaml`, then uncomment it in the Bitwarden
+   kustomization.
+3. Reconcile the app, visit `https://vault.example.com`, and register the
+   one initial owner account. Set
+   `globalSettings__disableUserRegistration` to `true` in
+   `apps/bitwarden/configmap.yaml`, commit, and reconcile again.
+4. Configure an encrypted, off-cluster backup for the `bitwarden-data` PVC
+   before storing any irreplaceable credentials. Test a restore.
 
 ## Configuration
 

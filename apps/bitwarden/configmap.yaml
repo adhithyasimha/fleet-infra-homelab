@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: bitwarden-config
+  namespace: apps
+data:
+  BW_DOMAIN: vault.example.com
+  BW_DB_PROVIDER: sqlite
+  BW_DB_FILE: /etc/bitwarden/vault.db
+  BW_ENABLE_SSL: "false"
+  BW_ENABLE_EVENTS: "false"
+  BW_ENABLE_SCIM: "false"
+  BW_ENABLE_SSO: "false"
+  # Registration is enabled only for the initial owner account. Change this to
+  # true after that account has been created, then reconcile the deployment.
+  globalSettings__disableUserRegistration: "false"
