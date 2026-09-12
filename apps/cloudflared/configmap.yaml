@@ -43,6 +43,8 @@ data:
         service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: jellyfin.example.invalid
         service: http://jellyfin.apps.svc.cluster.local:8096
+      - hostname: rss.example.invalid
+        service: http://freshrss.apps.svc.cluster.local:80
       - hostname: music.example.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
