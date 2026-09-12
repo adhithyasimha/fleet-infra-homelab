@@ -1,0 +1,53 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: freshrss
+  namespace: apps
+spec:
+  replicas: 1
+  strategy:
+    type: Recreate
+  selector:
+    matchLabels:
+      app: freshrss
+  template:
+    metadata:
+      labels:
+        app: freshrss
+    spec:
+      containers:
+        - name: freshrss
+          image: freshrss/freshrss:latest
+          env:
+            - name: TZ
+              value: Asia/Kolkata
+            # Refresh feeds twice per hour. FreshRSS recommends this schedule.
+            - name: CRON_MIN
+              value: "13,43"
+          ports:
+            - name: http
+              containerPort: 80
+          resources:
+            requests:
+              cpu: 100m
+              memory: 256Mi
+            limits:
+              cpu: "1"
+              memory: 1Gi
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+          volumeMounts:
+            - name: data
+              mountPath: /var/www/FreshRSS/data
+            - name: extensions
+              mountPath: /var/www/FreshRSS/extensions
+      volumes:
+        - name: data
+          persistentVolumeClaim:
+            claimName: freshrss-data
+        - name: extensions
+          persistentVolumeClaim:
+            claimName: freshrss-extensions

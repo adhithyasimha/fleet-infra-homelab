@@ -7,5 +7,6 @@ resources:
   - immich
   - nextcloud
   - jellyfin
+  - freshrss
   - navidrome
   - qbittorrent

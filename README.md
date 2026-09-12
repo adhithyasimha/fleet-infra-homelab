@@ -118,6 +118,14 @@ flux get helmrelease --all-namespaces --watch
 - Admin UI at `https://lldap.example.com`
 - LDAP is not exposed outside the cluster; only the HTTPS admin UI is routed through Traefik
 
+### FreshRSS (apps/freshrss)
+- Private RSS reader at `https://rss.example.com`
+- Persistent SQLite data and extensions volumes
+- Feeds refresh twice per hour
+- NetworkPolicy permits requests only from the in-cluster Cloudflare Tunnel
+- Cloudflare Access must protect the hostname before the first use; see the
+  setup section below
+
 ## LLDAP setup (first run)
 
 ### 1. Seal the bootstrap secret
@@ -152,6 +160,27 @@ Groups:   ou=groups,dc=wolfslair,dc=cloud
 Create a separate read-only bind user for each service instead of sharing the
 LLDAP administrator account. Nextcloud and Rancher can then be configured to
 use this LDAP endpoint in their respective administration interfaces.
+
+## FreshRSS setup (first run)
+
+1. In Cloudflare Zero Trust, create a **Self-hosted** Access application for
+   `rss.example.com`. Add an **Allow** policy limited to your identity and
+   enable MFA where available. Do this before visiting the hostname.
+2. Visit `https://rss.example.com` and complete the FreshRSS setup wizard
+   using the built-in SQLite database.
+3. In the authentication step, select **Form Authentication**. After setup, in
+   **Administration → Authentication**, leave anonymous reading disabled. In
+   **Administration → System configuration**, set the maximum number of user
+   accounts to `1` to disable new-user registration.
+4. Add feeds directly in FreshRSS, or import an OPML file. YouTube channels use
+   `https://www.youtube.com/feeds/videos.xml?channel_id=<CHANNEL_ID>`; news,
+   blogs, podcasts, newsletters, Reddit, GitHub releases, and most publications
+   can be added from their normal RSS or Atom feed URLs.
+
+The Cloudflare Access policy is intentionally not stored in this repository:
+it is account-level configuration managed by Cloudflare Zero Trust. The tunnel
+route in `apps/cloudflared/configmap.yaml` only connects the protected hostname
+to the private in-cluster service.
 
 ## Configuration
 
