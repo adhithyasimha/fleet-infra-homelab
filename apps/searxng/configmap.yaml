@@ -22,3 +22,21 @@ data:
     engines:
       - name: wikidata
         disabled: true
+      - name: brave.images
+        disabled: true
+      - name: duckduckgo images
+        disabled: true
+      - name: bing images
+        disabled: true
+      - name: flickr
+        disabled: true
+      - name: google cse images
+        disabled: true
+      - name: pinterest
+        disabled: true
+      - name: wikicommons.images
+        disabled: true
+      - name: lucide
+        disabled: true
+      - name: devicons
+        disabled: true
