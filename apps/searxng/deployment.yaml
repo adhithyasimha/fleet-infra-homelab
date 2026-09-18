@@ -12,6 +12,8 @@ spec:
       app: searxng
   template:
     metadata:
+      annotations:
+        checksum/config: 30ec1e5fe12197294a55b5c45006a633343f6a0e164a6e57a49702e835b4a290
       labels:
         app: searxng
     spec:
