@@ -16,3 +16,9 @@ data:
       formats:
         - html
         - json
+    outgoing:
+      request_timeout: 1.5
+      max_request_timeout: 3.0
+    engines:
+      - name: wikidata
+        disabled: true
