@@ -7,19 +7,11 @@ data:
   settings.yml: |
     use_default_settings:
       engines:
-        remove:
-          - wikidata
-          - brave.images
-          - duckduckgo images
-          - bing images
-          - flickr
-          - google cse images
-          - pinterest
-          - wikicommons.images
-          - lucide
-          - devicons
-          - tootfinder
-          - lemmy comments
+        keep_only:
+          - brave
+          - duckduckgo
+          - bing
+          - artic
     server:
       bind_address: 0.0.0.0
       port: 8080
