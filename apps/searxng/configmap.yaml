@@ -5,7 +5,21 @@ metadata:
   namespace: apps
 data:
   settings.yml: |
-    use_default_settings: true
+    use_default_settings:
+      engines:
+        remove:
+          - wikidata
+          - brave.images
+          - duckduckgo images
+          - bing images
+          - flickr
+          - google cse images
+          - pinterest
+          - wikicommons.images
+          - lucide
+          - devicons
+          - tootfinder
+          - lemmy comments
     server:
       bind_address: 0.0.0.0
       port: 8080
@@ -19,24 +33,3 @@ data:
     outgoing:
       request_timeout: 1.5
       max_request_timeout: 3.0
-    engines:
-      - name: wikidata
-        disabled: true
-      - name: brave.images
-        disabled: true
-      - name: duckduckgo images
-        disabled: true
-      - name: bing images
-        disabled: true
-      - name: flickr
-        disabled: true
-      - name: google cse images
-        disabled: true
-      - name: pinterest
-        disabled: true
-      - name: wikicommons.images
-        disabled: true
-      - name: lucide
-        disabled: true
-      - name: devicons
-        disabled: true
