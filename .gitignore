@@ -24,6 +24,7 @@ secrets/
 # Build artifacts
 dist/
 build/
+/generate_ingress
 
 # Kubeseal temp files
 .kubeseal/

@@ -1,0 +1,137 @@
+name: Publish sanitized showcase
+
+on:
+  push:
+    branches:
+      - main
+
+concurrency:
+  group: publish-showcase-main
+  cancel-in-progress: false
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout private source
+        uses: actions/checkout@v7
+        with:
+          path: source
+
+      - name: Checkout public showcase
+        uses: actions/checkout@v7
+        with:
+          repository: adhithyasimha/fleet-infra-homelab
+          ref: main
+          token: ${{ secrets.SHOWCASE_PUSH_TOKEN }}
+          path: showcase
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version-file: source/go.mod
+          cache-dependency-path: source/go.sum
+
+      - name: Test Go generator
+        working-directory: source
+        run: go test ./...
+
+      - name: Copy and redact showcase files
+        env:
+          REDACT_DOMAIN: ${{ secrets.REDACT_DOMAIN }}
+          REDACT_TUNNEL_UUID: ${{ secrets.REDACT_TUNNEL_UUID }}
+          REDACT_N8N_DB_PASSWORD: ${{ secrets.REDACT_N8N_DB_PASSWORD }}
+          REDACT_NEXTCLOUD_DB_PASSWORD: ${{ secrets.REDACT_NEXTCLOUD_DB_PASSWORD }}
+        run: |
+          set -euo pipefail
+          rsync -a --delete \
+            --exclude='.git/' \
+            --exclude='.github/' \
+            --exclude='apps/invidious/' \
+            source/ showcase/
+
+          python3 - <<'PY'
+            import hashlib
+            import os
+          from pathlib import Path
+
+          root = Path("showcase")
+            names = (
+              "REDACT_DOMAIN",
+              "REDACT_TUNNEL_UUID",
+              "REDACT_N8N_DB_PASSWORD",
+              "REDACT_NEXTCLOUD_DB_PASSWORD",
+            )
+            source_values = {}
+            for name in names:
+              value = os.environ.get(name, "")
+              if not value:
+                  raise SystemExit(f"Required Actions secret is missing: {name}")
+              source_values[name] = value.encode()
+
+            words = (
+              "amber", "birch", "cinder", "delta", "ember", "fern", "glacier", "harbor",
+              "indigo", "juniper", "kepler", "lumen", "maple", "nectar", "onyx", "prairie",
+              "quartz", "ripple", "summit", "timber", "umber", "velvet", "willow", "zenith",
+            )
+
+            def digest(name):
+              return hashlib.sha256(name.encode() + b":" + source_values[name]).digest()
+
+            def random_words(name):
+              hashed = digest(name)
+              indices = [int.from_bytes(hashed[offset:offset + 2], "big") % len(words) for offset in range(0, 8, 2)]
+              return "-".join(words[index] for index in indices)
+
+            tunnel_bytes = bytearray(digest("REDACT_TUNNEL_UUID")[:16])
+            tunnel_bytes[6] = (tunnel_bytes[6] & 0x0F) | 0x40
+            tunnel_bytes[8] = (tunnel_bytes[8] & 0x3F) | 0x80
+            tunnel_hex = tunnel_bytes.hex()
+            tunnel_replacement = f"{tunnel_hex[:8]}-{tunnel_hex[8:12]}-{tunnel_hex[12:16]}-{tunnel_hex[16:20]}-{tunnel_hex[20:]}".encode()
+
+            replacements = {
+              "REDACT_DOMAIN": f"{random_words('REDACT_DOMAIN')}.invalid".encode(),
+              "REDACT_TUNNEL_UUID": tunnel_replacement,
+              "REDACT_N8N_DB_PASSWORD": random_words("REDACT_N8N_DB_PASSWORD").encode(),
+              "REDACT_NEXTCLOUD_DB_PASSWORD": random_words("REDACT_NEXTCLOUD_DB_PASSWORD").encode(),
+            }
+
+          counts = {name: 0 for name in replacements}
+          for path in (item for item in root.rglob("*") if item.is_file()):
+              content = path.read_bytes()
+              updated = content
+              for name, replacement in replacements.items():
+                  source_value = source_values[name]
+                  occurrences = updated.count(source_value)
+                  if occurrences:
+                      counts[name] += occurrences
+                      updated = updated.replace(source_value, replacement)
+              if updated != content:
+                  path.write_bytes(updated)
+
+          missing = [name for name, count in counts.items() if count == 0]
+          if missing:
+              raise SystemExit("Configured source values were not found: " + ", ".join(missing))
+
+          for path in (item for item in root.rglob("*") if item.is_file()):
+              content = path.read_bytes()
+              if any(value in content for value in source_values.values()):
+                  raise SystemExit(f"Redaction check failed for {path}")
+          PY
+
+      - name: Commit and push showcase changes
+        working-directory: showcase
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add --all
+          git diff --cached --check
+          if git diff --cached --quiet; then
+            echo "Showcase is already up to date."
+            exit 0
+          fi
+          git commit -m "Sync sanitized showcase from fleet-infra"
+          git push origin main
