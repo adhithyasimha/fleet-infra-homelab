@@ -120,7 +120,7 @@ jobs:
                   if relative_path in password_paths:
                       def redact_password(match):
                           password_counts[relative_path] += 1
-                          seed = str(relative_path).encode() + b":" + match.group(2)
+                          seed = b"showcase-password:" + str(relative_path).encode()
                           return match.group(1) + word_name(seed).encode()
 
                       updated = re.sub(rb"(?m)^(\s*password:\s*)([^\s#]+)", redact_password, updated)
