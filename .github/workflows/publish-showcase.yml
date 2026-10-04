@@ -38,6 +38,11 @@ jobs:
         working-directory: source
         run: go test ./...
 
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.14"
+
       - name: Copy and redact showcase files
         run: |
           set -euo pipefail
@@ -46,7 +51,6 @@ jobs:
             --exclude='.github/' \
             --exclude='apps/invidious/' \
             source/ showcase/
-          rm -rf showcase/apps/invidious
 
           python3 - <<'PY'
           import hashlib
