@@ -39,11 +39,6 @@ jobs:
         run: go test ./...
 
       - name: Copy and redact showcase files
-        env:
-          REDACT_DOMAIN: ${{ secrets.REDACT_DOMAIN }}
-          REDACT_TUNNEL_UUID: ${{ secrets.REDACT_TUNNEL_UUID }}
-          REDACT_N8N_DB_PASSWORD: ${{ secrets.REDACT_N8N_DB_PASSWORD }}
-          REDACT_NEXTCLOUD_DB_PASSWORD: ${{ secrets.REDACT_NEXTCLOUD_DB_PASSWORD }}
         run: |
           set -euo pipefail
           rsync -a --delete \
@@ -51,74 +46,74 @@ jobs:
             --exclude='.github/' \
             --exclude='apps/invidious/' \
             source/ showcase/
+          rm -rf showcase/apps/invidious
 
           python3 - <<'PY'
-            import hashlib
-            import os
+          import hashlib
+          import re
+          import uuid
           from pathlib import Path
 
           root = Path("showcase")
-            names = (
-              "REDACT_DOMAIN",
-              "REDACT_TUNNEL_UUID",
-              "REDACT_N8N_DB_PASSWORD",
-              "REDACT_NEXTCLOUD_DB_PASSWORD",
-            )
-            source_values = {}
-            for name in names:
-              value = os.environ.get(name, "")
-              if not value:
-                  raise SystemExit(f"Required Actions secret is missing: {name}")
-              source_values[name] = value.encode()
-
-            words = (
+          words = (
               "amber", "birch", "cinder", "delta", "ember", "fern", "glacier", "harbor",
               "indigo", "juniper", "kepler", "lumen", "maple", "nectar", "onyx", "prairie",
               "quartz", "ripple", "summit", "timber", "umber", "velvet", "willow", "zenith",
-            )
+          )
 
-            def digest(name):
-              return hashlib.sha256(name.encode() + b":" + source_values[name]).digest()
-
-            def random_words(name):
-              hashed = digest(name)
+          def word_name(seed):
+              hashed = hashlib.sha256(seed).digest()
               indices = [int.from_bytes(hashed[offset:offset + 2], "big") % len(words) for offset in range(0, 8, 2)]
               return "-".join(words[index] for index in indices)
 
-            tunnel_bytes = bytearray(digest("REDACT_TUNNEL_UUID")[:16])
-            tunnel_bytes[6] = (tunnel_bytes[6] & 0x0F) | 0x40
-            tunnel_bytes[8] = (tunnel_bytes[8] & 0x3F) | 0x80
-            tunnel_hex = tunnel_bytes.hex()
-            tunnel_replacement = f"{tunnel_hex[:8]}-{tunnel_hex[8:12]}-{tunnel_hex[12:16]}-{tunnel_hex[16:20]}-{tunnel_hex[20:]}".encode()
+          domain_replacement = f"{word_name(b'domain:example.invalid')}.invalid".encode()
+          tunnel_replacement = str(uuid.UUID(bytes=hashlib.sha256(b"tunnel:wolfslair").digest()[:16], version=4)).encode()
+          password_paths = {
+              Path("infrastructure/postgres-helm-release.yaml"),
+              Path("apps/nextcloud/helm-release.yaml"),
+          }
+          password_counts = {path: 0 for path in password_paths}
+          domain_count = 0
+          tunnel_count = 0
 
-            replacements = {
-              "REDACT_DOMAIN": f"{random_words('REDACT_DOMAIN')}.invalid".encode(),
-              "REDACT_TUNNEL_UUID": tunnel_replacement,
-              "REDACT_N8N_DB_PASSWORD": random_words("REDACT_N8N_DB_PASSWORD").encode(),
-              "REDACT_NEXTCLOUD_DB_PASSWORD": random_words("REDACT_NEXTCLOUD_DB_PASSWORD").encode(),
-            }
-
-          counts = {name: 0 for name in replacements}
           for path in (item for item in root.rglob("*") if item.is_file()):
               content = path.read_bytes()
-              updated = content
-              for name, replacement in replacements.items():
-                  source_value = source_values[name]
-                  occurrences = updated.count(source_value)
-                  if occurrences:
-                      counts[name] += occurrences
-                      updated = updated.replace(source_value, replacement)
+              updated = content.replace(b"example.invalid", domain_replacement)
+              domain_count += content.count(b"example.invalid")
+
+              if path == root / "apps/cloudflared/configmap.yaml":
+                  updated, count = re.subn(
+                      rb"(?m)^(\s*tunnel:\s*)[0-9a-fA-F-]{36}(\s*)$",
+                      lambda match: match.group(1) + tunnel_replacement + match.group(2),
+                      updated,
+                  )
+                  tunnel_count += count
+
+              relative_path = path.relative_to(root)
+              if relative_path in password_paths:
+                  def replace_password(match):
+                      password_counts[relative_path] += 1
+                      seed = str(relative_path).encode() + b":" + match.group(2)
+                      return match.group(1) + word_name(seed).encode()
+
+                  updated = re.sub(
+                      rb"(?m)^(\s*password:\s*)([^\s#]+)",
+                      replace_password,
+                      updated,
+                  )
+
               if updated != content:
                   path.write_bytes(updated)
 
-          missing = [name for name, count in counts.items() if count == 0]
-          if missing:
-              raise SystemExit("Configured source values were not found: " + ", ".join(missing))
+          if domain_count == 0 or tunnel_count != 1 or any(count == 0 for count in password_counts.values()):
+              raise SystemExit("Expected domain, tunnel UUID, or password field was not found for redaction")
 
           for path in (item for item in root.rglob("*") if item.is_file()):
               content = path.read_bytes()
-              if any(value in content for value in source_values.values()):
-                  raise SystemExit(f"Redaction check failed for {path}")
+              if b"example.invalid" in content:
+                  raise SystemExit(f"Domain redaction check failed for {path}")
+          if b"00000000-0000-4000-8000-000000000000" in (root / "apps/cloudflared/configmap.yaml").read_bytes():
+              raise SystemExit("Tunnel UUID redaction check failed")
           PY
 
       - name: Commit and push showcase changes
