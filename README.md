@@ -115,11 +115,11 @@ flux get helmrelease --all-namespaces --watch
 ### LLDAP (infrastructure/lldap)
 - Lightweight LDAP server with SQLite-backed persistent storage
 - Internal LDAP service at `lldap.lldap.svc.cluster.local:3890`
-- Admin UI at `https://lldap.example.com`
+- Admin UI at `https://lldap.ember-willow-maple-lumen.invalid`
 - LDAP is not exposed outside the cluster; only the HTTPS admin UI is routed through Traefik
 
 ### FreshRSS (apps/freshrss)
-- Private RSS reader at `https://rss.example.com`
+- Private RSS reader at `https://rss.ember-willow-maple-lumen.invalid`
 - Persistent SQLite data and extensions volumes
 - Feeds refresh twice per hour
 - NetworkPolicy permits requests only from the in-cluster Cloudflare Tunnel
@@ -127,7 +127,7 @@ flux get helmrelease --all-namespaces --watch
   setup section below
 
 ### Bitwarden Lite (apps/bitwarden)
-- Official Bitwarden single-container deployment at `https://vault.example.com`
+- Official Bitwarden single-container deployment at `https://vault.ember-willow-maple-lumen.invalid`
 - Persistent SQLite vault data
 - Cloudflare Access is required before the public hostname is enabled
 - The Bitwarden installation ID and key are stored only in a sealed secret
@@ -149,7 +149,7 @@ kubeseal -f /tmp/lldap-config.yaml \
 ```
 
 Add the generated file to `infrastructure/lldap/kustomization.yaml`, then push it.
-Flux will deploy LLDAP. Log in at `https://lldap.example.com` with `admin` and
+Flux will deploy LLDAP. Log in at `https://lldap.ember-willow-maple-lumen.invalid` with `admin` and
 the password you chose.
 
 ### 2. Point services at LLDAP
@@ -170,9 +170,9 @@ use this LDAP endpoint in their respective administration interfaces.
 ## FreshRSS setup (first run)
 
 1. In Cloudflare Zero Trust, create a **Self-hosted** Access application for
-   `rss.example.com`. Add an **Allow** policy limited to your identity and
+   `rss.ember-willow-maple-lumen.invalid`. Add an **Allow** policy limited to your identity and
    enable MFA where available. Do this before visiting the hostname.
-2. Visit `https://rss.example.com` and complete the FreshRSS setup wizard
+2. Visit `https://rss.ember-willow-maple-lumen.invalid` and complete the FreshRSS setup wizard
    using the built-in SQLite database.
 3. In the authentication step, select **Form Authentication**. After setup, in
    **Administration → Authentication**, leave anonymous reading disabled. In
@@ -191,14 +191,14 @@ to the private in-cluster service.
 ## Bitwarden setup (first run)
 
 1. Create a Cloudflare Zero Trust **Self-hosted** Access application for
-   `vault.example.com`, limited to your identity. Do this before pushing the
+   `vault.ember-willow-maple-lumen.invalid`, limited to your identity. Do this before pushing the
    public tunnel route.
 2. Retrieve an installation ID and key from `https://bitwarden.com/host/`.
    Follow the commands in
    `apps/bitwarden/bitwarden-installation-sealed.example.yaml` to create
    `bitwarden-installation-sealed.yaml`, then uncomment it in the Bitwarden
    kustomization.
-3. Reconcile the app, visit `https://vault.example.com`, and register the
+3. Reconcile the app, visit `https://vault.ember-willow-maple-lumen.invalid`, and register the
    one initial owner account. Set
    `globalSettings__disableUserRegistration` to `true` in
    `apps/bitwarden/configmap.yaml`, commit, and reconcile again.

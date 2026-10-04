@@ -1,6 +1,6 @@
 name: immich
 namespace: apps
-host: immich.example.com
+host: immich.ember-willow-maple-lumen.invalid
 service: immich-server
 port: 2283
 path: /

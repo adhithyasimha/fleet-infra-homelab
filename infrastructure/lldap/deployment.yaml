@@ -37,7 +37,7 @@ spec:
             - name: LLDAP_KEY_SEED_FILE
               value: /etc/lldap-secrets/key-seed
             - name: LLDAP_HTTP_URL
-              value: https://lldap.example.com
+              value: https://lldap.ember-willow-maple-lumen.invalid
           volumeMounts:
             - name: data
               mountPath: /data

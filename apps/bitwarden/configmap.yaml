@@ -4,7 +4,7 @@ metadata:
   name: bitwarden-config
   namespace: apps
 data:
-  BW_DOMAIN: vault.example.com
+  BW_DOMAIN: vault.ember-willow-maple-lumen.invalid
   BW_DB_PROVIDER: sqlite
   BW_DB_FILE: /etc/bitwarden/vault.db
   BW_ENABLE_SSL: "false"

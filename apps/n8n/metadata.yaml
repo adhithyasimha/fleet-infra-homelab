@@ -1,6 +1,6 @@
 name: n8n
 namespace: apps
-host: n8n.example.com
+host: n8n.ember-willow-maple-lumen.invalid
 service: n8n
 port: 5678
 path: /

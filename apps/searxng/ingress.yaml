@@ -11,10 +11,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - search.example.com
+        - search.ember-willow-maple-lumen.invalid
       secretName: searxng-tls
   rules:
-    - host: search.example.com
+    - host: search.ember-willow-maple-lumen.invalid
       http:
         paths:
           - path: /

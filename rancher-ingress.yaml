@@ -10,10 +10,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - rancher.example.com
+        - rancher.ember-willow-maple-lumen.invalid
       secretName: rancher-tls
   rules:
-    - host: rancher.example.com
+    - host: rancher.ember-willow-maple-lumen.invalid
       http:
         paths:
         - path: /

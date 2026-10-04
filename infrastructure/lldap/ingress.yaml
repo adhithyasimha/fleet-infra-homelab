@@ -11,10 +11,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - lldap.example.com
+        - lldap.ember-willow-maple-lumen.invalid
       secretName: lldap-tls
   rules:
-    - host: lldap.example.com
+    - host: lldap.ember-willow-maple-lumen.invalid
       http:
         paths:
           - path: /

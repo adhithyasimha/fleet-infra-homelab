@@ -5,58 +5,58 @@ metadata:
   namespace: apps
 data:
   config.yml: |
-    tunnel: 00000000-0000-4000-8000-000000000000
+    tunnel: b71df5de-fb9f-4465-9b07-2a95fcff445c
     credentials-file: /etc/cloudflared/creds.json
     ingress:
-      - hostname: n8n.example.com
+      - hostname: n8n.ember-willow-maple-lumen.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: n8n.example.com
+      - hostname: n8n.ember-willow-maple-lumen.invalid
         service: http://n8n.apps.svc.cluster.local:5678
-      - hostname: rancher.example.com
+      - hostname: rancher.ember-willow-maple-lumen.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: rancher.example.com
+      - hostname: rancher.ember-willow-maple-lumen.invalid
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: immich.example.com
+      - hostname: immich.ember-willow-maple-lumen.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: immich.example.com
+      - hostname: immich.ember-willow-maple-lumen.invalid
         service: http://immich-server.apps.svc.cluster.local:2283
-      - hostname: nextcloud.example.com
+      - hostname: nextcloud.ember-willow-maple-lumen.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: nextcloud.example.com
+      - hostname: nextcloud.ember-willow-maple-lumen.invalid
         service: http://nextcloud.apps.svc.cluster.local:8080
-      - hostname: backroom.example.com
+      - hostname: backroom.ember-willow-maple-lumen.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: backroom.example.com
+      - hostname: backroom.ember-willow-maple-lumen.invalid
         service: http://nextcloud.apps.svc.cluster.local:8080
-      - hostname: lldap.example.com
+      - hostname: lldap.ember-willow-maple-lumen.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: lldap.example.com
+      - hostname: lldap.ember-willow-maple-lumen.invalid
         service: http://lldap.lldap.svc.cluster.local:17170
-      - hostname: jellyfin.example.com
+      - hostname: jellyfin.ember-willow-maple-lumen.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: jellyfin.example.com
+      - hostname: jellyfin.ember-willow-maple-lumen.invalid
         service: http://jellyfin.apps.svc.cluster.local:8096
-      - hostname: vault.example.com
+      - hostname: vault.ember-willow-maple-lumen.invalid
         service: http://bitwarden.apps.svc.cluster.local:8080
-      - hostname: rss.example.com
+      - hostname: rss.ember-willow-maple-lumen.invalid
         service: http://freshrss.apps.svc.cluster.local:80
-      - hostname: music.example.com
+      - hostname: music.ember-willow-maple-lumen.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: music.example.com
+      - hostname: music.ember-willow-maple-lumen.invalid
         service: http://navidrome.apps.svc.cluster.local:4533
-      - hostname: downloads.example.com
+      - hostname: downloads.ember-willow-maple-lumen.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: downloads.example.com
+      - hostname: downloads.ember-willow-maple-lumen.invalid
         service: http://qbittorrent.apps.svc.cluster.local:8080
-      - hostname: search.example.com
+      - hostname: search.ember-willow-maple-lumen.invalid
         service: http://searxng.apps.svc.cluster.local:8080
       - service: http_status:404

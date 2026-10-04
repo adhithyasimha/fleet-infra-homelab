@@ -30,7 +30,7 @@ spec:
             - name: ND_PORT
               value: "4533"
             - name: ND_BASEURL
-              value: https://music.example.com
+              value: https://music.ember-willow-maple-lumen.invalid
           ports:
             - name: http
               containerPort: 4533

@@ -11,11 +11,11 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - nextcloud.example.com
-        - backroom.example.com
+        - nextcloud.ember-willow-maple-lumen.invalid
+        - backroom.ember-willow-maple-lumen.invalid
       secretName: nextcloud-tls
   rules:
-    - host: nextcloud.example.com
+    - host: nextcloud.ember-willow-maple-lumen.invalid
       http:
         paths:
           - path: /
@@ -25,7 +25,7 @@ spec:
                 name: nextcloud
                 port:
                   number: 8080
-    - host: backroom.example.com
+    - host: backroom.ember-willow-maple-lumen.invalid
       http:
         paths:
           - path: /

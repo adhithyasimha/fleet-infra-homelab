@@ -1,6 +1,6 @@
 name: jellyfin
 namespace: apps
-host: jellyfin.example.com
+host: jellyfin.ember-willow-maple-lumen.invalid
 service: jellyfin
 port: 8096
 path: /

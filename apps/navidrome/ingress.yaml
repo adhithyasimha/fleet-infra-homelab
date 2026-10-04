@@ -11,10 +11,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - music.example.com
+        - music.ember-willow-maple-lumen.invalid
       secretName: navidrome-tls
   rules:
-    - host: music.example.com
+    - host: music.ember-willow-maple-lumen.invalid
       http:
         paths:
           - path: /

@@ -11,10 +11,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - immich.example.com
+        - immich.ember-willow-maple-lumen.invalid
       secretName: immich-tls
   rules:
-    - host: immich.example.com
+    - host: immich.ember-willow-maple-lumen.invalid
       http:
         paths:
           - path: /

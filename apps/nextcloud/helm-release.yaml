@@ -18,10 +18,10 @@ spec:
         namespace: flux-system
   values:
     nextcloud:
-      host: nextcloud.example.com
+      host: nextcloud.ember-willow-maple-lumen.invalid
       trustedDomains:
-        - nextcloud.example.com
-        - backroom.example.com
+        - nextcloud.ember-willow-maple-lumen.invalid
+        - backroom.ember-willow-maple-lumen.invalid
 
     internalDatabase:
       enabled: false
@@ -32,7 +32,7 @@ spec:
       host: postgres-nextcloud-postgresql.databases.svc.cluster.local:5432
       database: nextcloud
       user: nextcloud
-      password: REDACTED
+      password: lumen-nectar-amber-willow
 
     persistence:
       enabled: true

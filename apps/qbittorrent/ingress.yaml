@@ -11,10 +11,10 @@ spec:
   ingressClassName: traefik
   tls:
     - hosts:
-        - downloads.example.com
+        - downloads.ember-willow-maple-lumen.invalid
       secretName: qbittorrent-tls
   rules:
-    - host: downloads.example.com
+    - host: downloads.ember-willow-maple-lumen.invalid
       http:
         paths:
           - path: /
