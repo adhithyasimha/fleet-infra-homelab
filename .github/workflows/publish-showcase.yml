@@ -15,122 +15,140 @@ jobs:
     permissions:
       contents: read
     steps:
-      - name: Checkout private source
-        uses: actions/checkout@v7
-        with:
-          path: source
-
-      - name: Checkout public showcase
-        uses: actions/checkout@v7
-        with:
-          repository: adhithyasimha/fleet-infra-homelab
-          ref: main
-          token: ${{ secrets.SHOWCASE_PUSH_TOKEN }}
-          path: showcase
-
-      - name: Set up Go
-        uses: actions/setup-go@v6
-        with:
-          go-version-file: source/go.mod
-          cache-dependency-path: source/go.sum
-
-      - name: Test Go generator
-        working-directory: source
-        run: go test ./...
-
-      - name: Set up Python
-        uses: actions/setup-python@v7
-        with:
-          python-version: "3.14"
-
-      - name: Copy and redact showcase files
+      - name: Sync sanitized showcase
+        env:
+          SOURCE_TOKEN: ${{ github.token }}
+          SHOWCASE_PUSH_TOKEN: ${{ secrets.SHOWCASE_PUSH_TOKEN }}
         run: |
-          set -euo pipefail
-          rsync -a --delete \
-            --exclude='.git/' \
-            --exclude='.github/' \
-            --exclude='apps/invidious/' \
-            source/ showcase/
-
           python3 - <<'PY'
+          import base64
           import hashlib
+          import os
           import re
+          import shutil
+          import subprocess
+          import tempfile
           import uuid
           from pathlib import Path
 
-          root = Path("showcase")
+          source_repo = "adhithyasimha/fleet-infra"
+          showcase_repo = "adhithyasimha/fleet-infra-homelab"
           words = (
               "amber", "birch", "cinder", "delta", "ember", "fern", "glacier", "harbor",
               "indigo", "juniper", "kepler", "lumen", "maple", "nectar", "onyx", "prairie",
               "quartz", "ripple", "summit", "timber", "umber", "velvet", "willow", "zenith",
           )
 
+          def git_env(token):
+              env = os.environ.copy()
+              auth = base64.b64encode(f"x-access-token:{token}".encode()).decode()
+              env["GIT_CONFIG_COUNT"] = "1"
+              env["GIT_CONFIG_KEY_0"] = "http.https://github.com/.extraheader"
+              env["GIT_CONFIG_VALUE_0"] = f"AUTHORIZATION: basic {auth}"
+              return env
+
+          def run_git(args, cwd, token):
+              subprocess.run(
+                  ["git", *args],
+                  cwd=cwd,
+                  env=git_env(token),
+                  check=True,
+                  stdout=subprocess.PIPE,
+                  text=True,
+              )
+
           def word_name(seed):
-              hashed = hashlib.sha256(seed).digest()
-              indices = [int.from_bytes(hashed[offset:offset + 2], "big") % len(words) for offset in range(0, 8, 2)]
-              return "-".join(words[index] for index in indices)
+              digest = hashlib.sha256(seed).digest()
+              indexes = [int.from_bytes(digest[offset:offset + 2], "big") % len(words) for offset in range(0, 8, 2)]
+              return "-".join(words[index] for index in indexes)
 
-          domain_replacement = f"{word_name(b'domain:example.invalid')}.invalid".encode()
-          tunnel_replacement = str(uuid.UUID(bytes=hashlib.sha256(b"tunnel:wolfslair").digest()[:16], version=4)).encode()
-          password_paths = {
-              Path("infrastructure/postgres-helm-release.yaml"),
-              Path("apps/nextcloud/helm-release.yaml"),
-          }
-          password_counts = {path: 0 for path in password_paths}
-          domain_count = 0
-          tunnel_count = 0
+          source_token = os.environ["SOURCE_TOKEN"]
+          showcase_token = os.environ.get("SHOWCASE_PUSH_TOKEN", "")
+          if not source_token or not showcase_token:
+              raise SystemExit("SOURCE_TOKEN and SHOWCASE_PUSH_TOKEN are required")
 
-          for path in (item for item in root.rglob("*") if item.is_file()):
-              content = path.read_bytes()
-              updated = content.replace(b"example.invalid", domain_replacement)
-              domain_count += content.count(b"example.invalid")
+          with tempfile.TemporaryDirectory() as temporary:
+              work = Path(temporary)
+              source = work / "source"
+              showcase = work / "showcase"
+              run_git(["clone", "--depth", "1", f"https://github.com/{source_repo}.git", str(source)], work, source_token)
+              run_git(["clone", "--depth", "1", "--branch", "main", f"https://github.com/{showcase_repo}.git", str(showcase)], work, showcase_token)
 
-              if path == root / "apps/cloudflared/configmap.yaml":
-                  updated, count = re.subn(
-                      rb"(?m)^(\s*tunnel:\s*)[0-9a-fA-F-]{36}(\s*)$",
-                      lambda match: match.group(1) + tunnel_replacement + match.group(2),
-                      updated,
-                  )
-                  tunnel_count += count
+              for child in showcase.iterdir():
+                  if child.name == ".git":
+                      continue
+                  shutil.rmtree(child) if child.is_dir() else child.unlink()
 
-              relative_path = path.relative_to(root)
-              if relative_path in password_paths:
-                  def replace_password(match):
-                      password_counts[relative_path] += 1
-                      seed = str(relative_path).encode() + b":" + match.group(2)
-                      return match.group(1) + word_name(seed).encode()
+              for child in source.iterdir():
+                  if child.name in {".git", ".github"}:
+                      continue
+                  if child == source / "apps" and child.is_dir():
+                      shutil.copytree(child, showcase / child.name, ignore=shutil.ignore_patterns("invidious"))
+                  elif child.is_dir():
+                      shutil.copytree(child, showcase / child.name)
+                  else:
+                      shutil.copy2(child, showcase / child.name)
 
-                  updated = re.sub(
-                      rb"(?m)^(\s*password:\s*)([^\s#]+)",
-                      replace_password,
-                      updated,
-                  )
+              shutil.rmtree(showcase / "apps" / "invidious", ignore_errors=True)
 
-              if updated != content:
-                  path.write_bytes(updated)
+              domain_replacement = f"{word_name(b'domain:example.invalid')}.invalid".encode()
+              tunnel_replacement = str(
+                  uuid.UUID(bytes=hashlib.sha256(b"tunnel:wolfslair").digest()[:16], version=4)
+              ).encode()
+              password_paths = {
+                  Path("infrastructure/postgres-helm-release.yaml"),
+                  Path("apps/nextcloud/helm-release.yaml"),
+              }
+              password_counts = {path: 0 for path in password_paths}
+              domain_count = 0
+              tunnel_count = 0
 
-          if domain_count == 0 or tunnel_count != 1 or any(count == 0 for count in password_counts.values()):
-              raise SystemExit("Expected domain, tunnel UUID, or password field was not found for redaction")
+              for path in (item for item in showcase.rglob("*") if item.is_file()):
+                  content = path.read_bytes()
+                  updated = content.replace(b"example.invalid", domain_replacement)
+                  domain_count += content.count(b"example.invalid")
 
-          for path in (item for item in root.rglob("*") if item.is_file()):
-              content = path.read_bytes()
-              if b"example.invalid" in content:
-                  raise SystemExit(f"Domain redaction check failed for {path}")
-          if b"00000000-0000-4000-8000-000000000000" in (root / "apps/cloudflared/configmap.yaml").read_bytes():
-              raise SystemExit("Tunnel UUID redaction check failed")
+                  if path == showcase / "apps/cloudflared/configmap.yaml":
+                      updated, count = re.subn(
+                          rb"(?m)^(\s*tunnel:\s*)[0-9a-fA-F-]{36}(\s*)$",
+                          lambda match: match.group(1) + tunnel_replacement + match.group(2),
+                          updated,
+                      )
+                      tunnel_count += count
+
+                  relative_path = path.relative_to(showcase)
+                  if relative_path in password_paths:
+                      def redact_password(match):
+                          password_counts[relative_path] += 1
+                          seed = str(relative_path).encode() + b":" + match.group(2)
+                          return match.group(1) + word_name(seed).encode()
+
+                      updated = re.sub(rb"(?m)^(\s*password:\s*)([^\s#]+)", redact_password, updated)
+
+                  if updated != content:
+                      path.write_bytes(updated)
+
+              if domain_count == 0 or tunnel_count != 1 or any(count == 0 for count in password_counts.values()):
+                  raise SystemExit("Expected domain, tunnel UUID, or password field was not found for redaction")
+
+              for path in (item for item in showcase.rglob("*") if item.is_file()):
+                  if b"example.invalid" in path.read_bytes():
+                      raise SystemExit(f"Domain redaction check failed: {path.relative_to(showcase)}")
+              if b"00000000-0000-4000-8000-000000000000" in (showcase / "apps/cloudflared/configmap.yaml").read_bytes():
+                  raise SystemExit("Tunnel UUID redaction check failed")
+              if (showcase / "apps" / "invidious").exists():
+                  raise SystemExit("Invidious exclusion check failed")
+
+              run_git(["config", "user.name", "github-actions[bot]"], showcase, showcase_token)
+              run_git(["config", "user.email", "41898282+github-actions[bot]@users.noreply.github.com"], showcase, showcase_token)
+              run_git(["add", "--all"], showcase, showcase_token)
+              subprocess.run(["git", "diff", "--cached", "--check"], cwd=showcase, check=True)
+              changed = subprocess.run(["git", "diff", "--cached", "--quiet"], cwd=showcase)
+              if changed.returncode == 0:
+                  print("Showcase is already up to date")
+              elif changed.returncode == 1:
+                  run_git(["commit", "-m", "Sync sanitized showcase from fleet-infra"], showcase, showcase_token)
+                  run_git(["push", "origin", "main"], showcase, showcase_token)
+              else:
+                  raise SystemExit(changed.returncode)
           PY
-
-      - name: Commit and push showcase changes
-        working-directory: showcase
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add --all
-          git diff --cached --check
-          if git diff --cached --quiet; then
-            echo "Showcase is already up to date."
-            exit 0
-          fi
-          git commit -m "Sync sanitized showcase from fleet-infra"
-          git push origin main
