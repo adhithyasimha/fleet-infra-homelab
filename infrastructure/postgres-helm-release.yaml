@@ -18,7 +18,7 @@ spec:
       postgresql:
         auth:
           username: n8n
-          password: ripple-cinder-quartz-maple
+          password: indigo-harbor-kepler-velvet
           database: n8n
     
     image:

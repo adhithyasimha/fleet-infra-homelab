@@ -32,7 +32,7 @@ spec:
       host: postgres-nextcloud-postgresql.databases.svc.cluster.local:5432
       database: nextcloud
       user: nextcloud
-      password: lumen-nectar-amber-willow
+      password: prairie-delta-juniper-delta
 
     persistence:
       enabled: true
