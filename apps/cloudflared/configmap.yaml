@@ -61,6 +61,8 @@ data:
         service: http://qbittorrent.apps.svc.cluster.local:8080
       - hostname: search.example.invalid
         service: http://searxng.apps.svc.cluster.local:8080
+      - hostname: home.example.invalid
+        service: http://glance.apps.svc.cluster.local:8080
       - hostname: pihole.example.invalid
         service: http://pihole.apps.svc.cluster.local:80
       - service: http_status:404
