@@ -155,9 +155,11 @@ flux get helmrelease --all-namespaces --watch
 ### Glance (apps/glance)
 - Home dashboard at `https://home.ember-willow-maple-lumen.invalid`, routed through Cloudflare
   Tunnel to the in-cluster service
+- Glance's built-in username/password authentication is enabled; sign in as
+  `admin` using the generated password provided when the service was enabled
 - Links to the homelab services, with a search box, clock, calendar, and Hacker
   News widget
-- Configure a Cloudflare Access application for this hostname before use
+- Keep Cloudflare Access enabled for this hostname as an additional protection
 
 ## LLDAP setup (first run)
 

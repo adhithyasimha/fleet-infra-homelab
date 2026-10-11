@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       annotations:
-        checksum/config: 05f4793d83cb0d57eaa73b3feb38a1262093172751647075bc50c867e356d45f
+        checksum/config: 10e08a173050f7702c74af07aeaab0d705baf52eed093765a53e1b818ebe49da
       labels:
         app: glance
     spec:
@@ -21,6 +21,17 @@ spec:
       containers:
         - name: glance
           image: glanceapp/glance:latest
+          env:
+            - name: GLANCE_SECRET_KEY
+              valueFrom:
+                secretKeyRef:
+                  name: glance-auth
+                  key: secret-key
+            - name: GLANCE_PASSWORD_HASH
+              valueFrom:
+                secretKeyRef:
+                  name: glance-auth
+                  key: password-hash
           ports:
             - name: http
               containerPort: 8080
