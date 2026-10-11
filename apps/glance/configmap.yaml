@@ -1,0 +1,47 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: glance-config
+  namespace: apps
+data:
+  glance.yml: |
+    pages:
+      - name: Home
+        columns:
+          - size: small
+            widgets:
+              - type: clock
+                hour-format: 24h
+                timezones:
+                  - timezone: Asia/Kolkata
+                    label: India
+              - type: calendar
+                first-day-of-week: monday
+          - size: full
+            widgets:
+              - type: search
+                search-engine: duckduckgo
+                autofocus: true
+              - type: bookmarks
+                groups:
+                  - title: Media
+                    links:
+                      - title: Photos
+                        url: https://photos.ember-willow-maple-lumen.invalid
+                      - title: Jellyfin
+                        url: https://jellyfin.ember-willow-maple-lumen.invalid
+                      - title: Music
+                        url: https://music.ember-willow-maple-lumen.invalid
+                  - title: Services
+                    links:
+                      - title: Nextcloud
+                        url: https://nextcloud.ember-willow-maple-lumen.invalid
+                      - title: FreshRSS
+                        url: https://rss.ember-willow-maple-lumen.invalid
+                      - title: Search
+                        url: https://search.ember-willow-maple-lumen.invalid
+                      - title: Pi-hole
+                        url: https://pihole.ember-willow-maple-lumen.invalid/admin/
+              - type: hacker-news
+                limit: 10
+                collapse-after: 5

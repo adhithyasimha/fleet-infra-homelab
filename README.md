@@ -152,6 +152,13 @@ flux get helmrelease --all-namespaces --watch
   service also limits source addresses to `192.168.1.0/24` (update this if the
   LAN subnet changes)
 
+### Glance (apps/glance)
+- Home dashboard at `https://home.ember-willow-maple-lumen.invalid`, routed through Cloudflare
+  Tunnel to the in-cluster service
+- Links to the homelab services, with a search box, clock, calendar, and Hacker
+  News widget
+- Configure a Cloudflare Access application for this hostname before use
+
 ## LLDAP setup (first run)
 
 ### 1. Seal the bootstrap secret
