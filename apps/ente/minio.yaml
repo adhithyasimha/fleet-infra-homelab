@@ -31,6 +31,8 @@ spec:
         - name: minio
           image: pgsty/silo
           command:
+            - silo
+          args:
             - server
             - /data
             - --address
@@ -67,12 +69,12 @@ spec:
                   - /bin/sh
                   - -ec
                   - |
-                    until mc alias set ente http://127.0.0.1:3200 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" >/dev/null 2>&1; do
+                    until mcli aliasset ente http://127.0.0.1:3200 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" >/dev/null 2>&1; do
                       sleep 2
                     done
-                    mc mb --ignore-existing ente/b2-eu-cen
-                    mc mb --ignore-existing ente/wasabi-eu-central-2-v3
-                    mc mb --ignore-existing ente/scw-eu-fr-v3
+                    mcli mb --ignore-existing ente/b2-eu-cen
+                    mcli mb --ignore-existing ente/wasabi-eu-central-2-v3
+                    mcli mb --ignore-existing ente/scw-eu-fr-v3
           resources:
             requests:
               cpu: 100m
