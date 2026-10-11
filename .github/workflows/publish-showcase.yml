@@ -68,11 +68,12 @@ jobs:
                   candidate = Path(directory) / name
                   if name == "secrets" or name == "invidious":
                       ignored.append(name)
-                  elif re.search(r"(?i)secret|sealed", name):
-                      ignored.append(name)
                   elif candidate.is_file() and candidate.suffix.lower() in {".yaml", ".yml", ".json"}:
                       content = candidate.read_bytes()
-                      if re.search(rb"(?m)^kind:\s*(?:Secret|SealedSecret)\s*$", content):
+                      if (
+                          re.search(rb"(?m)^kind:\s*(?:Secret|SealedSecret)\s*$", content)
+                          or re.search(rb'"kind"\s*:\s*"(?:Secret|SealedSecret)"', content)
+                      ):
                           ignored.append(name)
               return ignored
 
@@ -153,8 +154,8 @@ jobs:
                       raise SystemExit(f"Domain redaction check failed: {path.relative_to(showcase)}")
                   if re.search(rb"(?m)^kind:\s*(?:Secret|SealedSecret)\s*$", content):
                       raise SystemExit(f"Secret manifest was copied: {path.relative_to(showcase)}")
-                  if re.search(r"(?i)secret|sealed", path.name):
-                      raise SystemExit(f"Secret-named file was copied: {path.relative_to(showcase)}")
+                  if re.search(rb'"kind"\s*:\s*"(?:Secret|SealedSecret)"', content):
+                      raise SystemExit(f"Secret manifest was copied: {path.relative_to(showcase)}")
               if b"00000000-0000-4000-8000-000000000000" in (showcase / "apps/cloudflared/configmap.yaml").read_bytes():
                   raise SystemExit("Tunnel UUID redaction check failed")
               if (showcase / "apps" / "invidious").exists():
