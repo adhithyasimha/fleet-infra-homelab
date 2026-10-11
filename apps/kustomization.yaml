@@ -12,3 +12,4 @@ resources:
   - qbittorrent
   - searxng
   - pihole
+  - ente

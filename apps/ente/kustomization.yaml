@@ -5,4 +5,4 @@ resources:
   - minio.yaml
   - museum.yaml
   - web.yaml
-  # Add ente-credentials-sealed.yaml after creating it; see README.md.
+  - ente-credentials-sealed.yaml
