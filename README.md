@@ -130,7 +130,8 @@ flux get helmrelease --all-namespaces --watch
 - Official Bitwarden single-container deployment at `https://vault.ember-willow-maple-lumen.invalid`
 - Persistent SQLite vault data
 - Cloudflare Access is required before the public hostname is enabled
-- Uses SQLite, so Bitwarden installation ID and key are not required
+- Uses SQLite for vault storage; Bitwarden still requires its official installation
+  ID and key to start its backend services
 
 ### Ente Photos (apps/ente)
 - Self-hosted Ente Photos UI and Museum API served together at
@@ -211,10 +212,22 @@ to the private in-cluster service.
 1. Create a Cloudflare Zero Trust **Self-hosted** Access application for
    `vault.ember-willow-maple-lumen.invalid`, limited to your identity. Do this before enabling the
    public tunnel route.
-2. Visit `https://vault.ember-willow-maple-lumen.invalid` and register the initial owner
+2. Get the installation ID and key from <https://bitwarden.com/host/>. From the
+   repository root, seal them for the target cluster without putting the key in
+   shell history or committing plaintext:
+
+   ```bash
+   KUBE_CONTEXT=<target-cluster-context> bash apps/bitwarden/generate-installation-secret.sh
+   ```
+
+   The helper prompts for the installation ID and key, hides key input, and
+   creates `apps/bitwarden/bitwarden-installation-sealed.yaml`. The Bitwarden
+   Kustomization includes that manifest. Commit and push the generated sealed
+   manifest; Bitwarden Lite requires these values even when using SQLite.
+3. Visit `https://vault.ember-willow-maple-lumen.invalid` and register the initial owner
    account. Set `globalSettings__disableUserRegistration` to `"true"` in
    `apps/bitwarden/configmap.yaml` after registration.
-3. Configure an encrypted, off-cluster backup for the `bitwarden-data` PVC
+4. Configure an encrypted, off-cluster backup for the `bitwarden-data` PVC
    before storing any irreplaceable credentials. Test a restore.
 
 ## Ente Photos setup (first run)
