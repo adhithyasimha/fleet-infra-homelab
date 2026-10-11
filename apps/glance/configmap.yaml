@@ -5,6 +5,13 @@ metadata:
   namespace: apps
 data:
   glance.yml: |
+    auth:
+      secret-key: ${GLANCE_SECRET_KEY}
+      users:
+        admin:
+          password-hash: ${GLANCE_PASSWORD_HASH}
+    server:
+      proxied: true
     pages:
       - name: Home
         columns:

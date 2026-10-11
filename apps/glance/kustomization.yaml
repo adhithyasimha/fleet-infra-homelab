@@ -5,3 +5,4 @@ resources:
   - deployment.yaml
   - service.yaml
   - networkpolicy.yaml
+  - glance-auth-sealed.yaml
