@@ -12,7 +12,7 @@ spec:
     metadata:
       annotations:
         # Update when configmap.yaml changes so the subPath-mounted config reloads.
-        checksum/config: a0b1cd92f6d24e61a353b3bdbb6b56fbcbfcdafd8a2fe1687944fe6672cb4e06
+        checksum/config: f62e83af4abae3fb6f20fbe90b3c1876413545b08d07b92d7c5fc410433316c2
       labels:
         app: cloudflared
     spec:
