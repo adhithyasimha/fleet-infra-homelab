@@ -137,8 +137,8 @@ flux get helmrelease --all-namespaces --watch
   `https://photos.example.invalid`
 - PostgreSQL and MinIO-backed storage with persistent volumes
 - The object-storage endpoint is `https://ente-storage.example.invalid`
-- Credentials and Museum configuration must be generated locally and sealed
-  before enabling the app in Flux
+- Ente is enabled in Flux with cluster-sealed credentials in
+  `apps/ente/ente-credentials-sealed.yaml`
 
 ### Pi-hole (apps/pihole)
 - One Pi-hole instance serves DNS to LAN devices configured to use its
@@ -219,27 +219,23 @@ to the private in-cluster service.
 
 ## Ente Photos setup (first run)
 
-1. With `kubectl` pointed at the target cluster, generate unique credentials and
-   seal them locally:
+1. Ensure DNS routes `photos.example.invalid` and
+   `ente-storage.example.invalid` to the existing Cloudflare Tunnel. Both
+   hostnames must be present in Cloudflare DNS and in
+   `apps/cloudflared/configmap.yaml`.
+2. Wait for Flux to deploy Ente and its storage:
 
    ```bash
-   KUBE_CONTEXT=<target-cluster-context> sh apps/ente/generate-credentials.sh
+   kubectl get pods,pvc -n apps
    ```
 
-   The script creates `apps/ente/ente-credentials-sealed.yaml`; plaintext
-   credentials are only held in local temporary files, which it removes. The
-   script verifies the selected context and seals against that cluster's
-   Sealed Secrets certificate.
-2. Add `ente-credentials-sealed.yaml` to `apps/ente/kustomization.yaml`, then
-   add `ente` to `apps/kustomization.yaml`. The generated Museum configuration
-   uses PostgreSQL at `ente-postgres.apps.svc.cluster.local:5432` and MinIO
-   buckets `b2-eu-cen`, `wasabi-eu-central-2-v3`, and `scw-eu-fr-v3` at
-   `ente-storage.example.invalid`, with TLS and path-style URLs enabled.
-3. Verify that DNS routes `photos.example.invalid` and
-   `ente-storage.example.invalid` to the existing Cloudflare Tunnel before
-   reconciling.
-4. Visit `https://photos.example.invalid` to register the first account. Set
-   up backups for both Ente PVCs and test restores before uploading originals.
+   Ente credentials are already sealed for the cluster and included in Flux.
+   To generate a replacement for a different cluster, use
+   `KUBE_CONTEXT=<target-cluster-context> sh apps/ente/generate-credentials.sh`;
+   the script keeps plaintext in private temporary files and seals against that
+   cluster's Sealed Secrets certificate.
+3. Visit `https://photos.example.invalid` to register the first account. Set up
+   backups for both Ente PVCs and test restores before uploading originals.
 
 ## Pi-hole setup (first run)
 

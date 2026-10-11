@@ -26,13 +26,18 @@ if [ -e "$sealed_secret" ]; then
 fi
 
 umask 077
-museum_config=$(mktemp)
+secret_data_dir=$(mktemp -d)
 sealing_cert=$(mktemp)
-secret_env=$(mktemp)
 secret_manifest=$(mktemp)
 sealed_manifest=$(mktemp "$repo_root/apps/ente/.ente-credentials-sealed.XXXXXX")
 cleanup() {
-  rm -f "$museum_config" "$sealing_cert" "$secret_env" "$secret_manifest" "$sealed_manifest"
+  rm -f \
+    "$secret_data_dir/POSTGRES_PASSWORD" \
+    "$secret_data_dir/MINIO_ROOT_USER" \
+    "$secret_data_dir/MINIO_ROOT_PASSWORD" \
+    "$secret_data_dir/museum.yaml" \
+    "$sealing_cert" "$secret_manifest" "$sealed_manifest"
+  rmdir "$secret_data_dir"
 }
 trap cleanup EXIT HUP INT TERM
 
@@ -50,13 +55,11 @@ encryption_key=$(openssl rand -base64 32 | tr -d '\n')
 hash_key=$(openssl rand -base64 64 | tr -d '\n')
 jwt_secret=$(openssl rand -base64 32 | tr -d '\n' | tr '+/' '-_')
 
-cat >"$secret_env" <<EOF
-POSTGRES_PASSWORD=$postgres_password
-MINIO_ROOT_USER=$minio_root_user
-MINIO_ROOT_PASSWORD=$minio_root_password
-EOF
+printf '%s' "$postgres_password" >"$secret_data_dir/POSTGRES_PASSWORD"
+printf '%s' "$minio_root_user" >"$secret_data_dir/MINIO_ROOT_USER"
+printf '%s' "$minio_root_password" >"$secret_data_dir/MINIO_ROOT_PASSWORD"
 
-cat >"$museum_config" <<EOF
+cat >"$secret_data_dir/museum.yaml" <<EOF
 db:
   host: ente-postgres.apps.svc.cluster.local
   port: 5432
@@ -97,8 +100,7 @@ EOF
 
 kubectl --context "$KUBE_CONTEXT" create secret generic ente-credentials \
   --namespace apps \
-  --from-env-file="$secret_env" \
-  --from-file=museum.yaml="$museum_config" \
+  --from-file="$secret_data_dir" \
   --dry-run=client -o yaml >"$secret_manifest"
 
 kubeseal --cert "$sealing_cert" --format yaml <"$secret_manifest" >"$sealed_manifest"
