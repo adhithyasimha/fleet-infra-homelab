@@ -6,4 +6,3 @@ resources:
   - pvc.yaml
   - service.yaml
   - networkpolicy.yaml
-  # - bitwarden-installation-sealed.yaml

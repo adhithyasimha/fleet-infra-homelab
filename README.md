@@ -130,7 +130,21 @@ flux get helmrelease --all-namespaces --watch
 - Official Bitwarden single-container deployment at `https://vault.example.invalid`
 - Persistent SQLite vault data
 - Cloudflare Access is required before the public hostname is enabled
-- The Bitwarden installation ID and key are stored only in a sealed secret
+- Uses SQLite, so Bitwarden installation ID and key are not required
+
+### Ente Photos (apps/ente)
+- Self-hosted Ente Photos UI and Museum API served together at
+  `https://photos.example.invalid`
+- PostgreSQL and MinIO-backed storage with persistent volumes
+- The object-storage endpoint is `https://ente-storage.example.invalid`
+- Credentials and Museum configuration must be generated locally and sealed
+  before enabling the app in Flux
+
+### Pi-hole (apps/pihole)
+- DNS service listens on TCP/UDP port 53 on the Kubernetes node
+- Admin UI is routed through Cloudflare Tunnel at `https://pihole.example.invalid`
+- Configure Cloudflare Access for the admin hostname and restrict port 53 to
+  trusted LAN clients at the network firewall
 
 ## LLDAP setup (first run)
 
@@ -191,19 +205,47 @@ to the private in-cluster service.
 ## Bitwarden setup (first run)
 
 1. Create a Cloudflare Zero Trust **Self-hosted** Access application for
-   `vault.example.invalid`, limited to your identity. Do this before pushing the
+   `vault.example.invalid`, limited to your identity. Do this before enabling the
    public tunnel route.
-2. Retrieve an installation ID and key from `https://bitwarden.com/host/`.
-   Follow the commands in
-   `apps/bitwarden/bitwarden-installation-sealed.example.yaml` to create
-   `bitwarden-installation-sealed.yaml`, then uncomment it in the Bitwarden
-   kustomization.
-3. Reconcile the app, visit `https://vault.example.invalid`, and register the
-   one initial owner account. Set
-   `globalSettings__disableUserRegistration` to `true` in
-   `apps/bitwarden/configmap.yaml`, commit, and reconcile again.
-4. Configure an encrypted, off-cluster backup for the `bitwarden-data` PVC
+2. Visit `https://vault.example.invalid` and register the initial owner
+   account. Set `globalSettings__disableUserRegistration` to `"true"` in
+   `apps/bitwarden/configmap.yaml` after registration.
+3. Configure an encrypted, off-cluster backup for the `bitwarden-data` PVC
    before storing any irreplaceable credentials. Test a restore.
+
+## Ente Photos setup (first run)
+
+1. With `kubectl` pointed at the target cluster, generate unique credentials and
+   seal them locally:
+
+   ```bash
+   sh apps/ente/generate-credentials.sh
+   ```
+
+   The script creates `apps/ente/ente-credentials-sealed.yaml`; plaintext
+   credentials are only held in local temporary files, which it removes.
+2. Add `ente-credentials-sealed.yaml` to `apps/ente/kustomization.yaml`, then
+   add `ente` to `apps/kustomization.yaml`. The generated Museum configuration
+   uses PostgreSQL at `ente-postgres.apps.svc.cluster.local:5432` and MinIO
+   buckets `b2-eu-cen`, `wasabi-eu-central-2-v3`, and `scw-eu-fr-v3` at
+   `ente-storage.example.invalid`, with TLS and path-style URLs enabled.
+3. Verify that DNS routes `photos.example.invalid` and
+   `ente-storage.example.invalid` to the existing Cloudflare Tunnel before
+   reconciling.
+4. Visit `https://photos.example.invalid` to register the first account. Set
+   up backups for both Ente PVCs and test restores before uploading originals.
+
+## Pi-hole setup (first run)
+
+1. Configure a stable LAN address for the Kubernetes node running Pi-hole.
+   Point LAN clients or the router's DHCP DNS setting at that address.
+2. Ensure the network firewall allows TCP/UDP port 53 only from the trusted LAN
+   and blocks it from the public internet. Do not publish DNS through the
+   Cloudflare Tunnel.
+3. Create a Cloudflare Zero Trust **Self-hosted** Access application for
+   `pihole.example.invalid` before using the admin UI. Pi-hole generates an
+   initial random admin password; retrieve it from the first startup logs with
+   `kubectl logs -n apps deploy/pihole`.
 
 ## Configuration
 

@@ -18,11 +18,13 @@ data:
         service: http://traefik.kube-system.svc.cluster.local:80
       - hostname: rancher.example.invalid
         service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: immich.example.invalid
-        path: /.well-known/acme-challenge/*
-        service: http://traefik.kube-system.svc.cluster.local:80
-      - hostname: immich.example.invalid
-        service: http://immich-server.apps.svc.cluster.local:2283
+      - hostname: photos.example.invalid
+        path: ^/(admin|anon-identity|anon-profiles|attachments|authenticator|billing|cast|collection-actions|collections|comments|comments-reactions|contacts|custom-domain|diff|discount|email-hash|emails-from-hashes|emergency-contacts|events|family|file|file-data|file-link|files|fire|info|legacy-kits|listmonk|mail|memory-share|metrics|multipart-upload-url|options|participants|pass-info|passkeys|paste|ping|public-collection|public-memory|push|queue|reactions|remote-store|social|storage-bonus|thumbnail|trash|unknown-api|upload-url|user|user-entity|users|verify-password)(/.*)?$
+        service: http://ente-museum.apps.svc.cluster.local:8080
+      - hostname: photos.example.invalid
+        service: http://ente-web.apps.svc.cluster.local:3000
+      - hostname: ente-storage.example.invalid
+        service: http://ente-minio.apps.svc.cluster.local:3200
       - hostname: nextcloud.example.invalid
         path: /.well-known/acme-challenge/*
         service: http://traefik.kube-system.svc.cluster.local:80
@@ -59,4 +61,6 @@ data:
         service: http://qbittorrent.apps.svc.cluster.local:8080
       - hostname: search.example.invalid
         service: http://searxng.apps.svc.cluster.local:8080
+      - hostname: pihole.example.invalid
+        service: http://pihole.apps.svc.cluster.local:80
       - service: http_status:404

@@ -62,6 +62,20 @@ jobs:
               indexes = [int.from_bytes(digest[offset:offset + 2], "big") % len(words) for offset in range(0, 8, 2)]
               return "-".join(words[index] for index in indexes)
 
+          def ignore_showcase_files(directory, names):
+              ignored = []
+              for name in names:
+                  candidate = Path(directory) / name
+                  if name == "secrets" or name == "invidious":
+                      ignored.append(name)
+                  elif re.search(r"(?i)secret|sealed", name):
+                      ignored.append(name)
+                  elif candidate.is_file() and candidate.suffix.lower() in {".yaml", ".yml", ".json"}:
+                      content = candidate.read_bytes()
+                      if re.search(rb"(?m)^kind:\s*(?:Secret|SealedSecret)\s*$", content):
+                          ignored.append(name)
+              return ignored
+
           source_token = os.environ["SOURCE_TOKEN"]
           showcase_token = os.environ.get("SHOWCASE_PUSH_TOKEN", "")
           if not source_token or not showcase_token:
@@ -82,10 +96,12 @@ jobs:
               for child in source.iterdir():
                   if child.name in {".git", ".github"}:
                       continue
+                  if child.name in ignore_showcase_files(source, [child.name]):
+                      continue
                   if child == source / "apps" and child.is_dir():
-                      shutil.copytree(child, showcase / child.name, ignore=shutil.ignore_patterns("invidious"))
+                      shutil.copytree(child, showcase / child.name, ignore=ignore_showcase_files)
                   elif child.is_dir():
-                      shutil.copytree(child, showcase / child.name)
+                      shutil.copytree(child, showcase / child.name, ignore=ignore_showcase_files)
                   else:
                       shutil.copy2(child, showcase / child.name)
 
@@ -132,8 +148,13 @@ jobs:
                   raise SystemExit("Expected domain, tunnel UUID, or password field was not found for redaction")
 
               for path in (item for item in showcase.rglob("*") if item.is_file()):
-                  if b"example.invalid" in path.read_bytes():
+                  content = path.read_bytes()
+                  if b"example.invalid" in content:
                       raise SystemExit(f"Domain redaction check failed: {path.relative_to(showcase)}")
+                  if re.search(rb"(?m)^kind:\s*(?:Secret|SealedSecret)\s*$", content):
+                      raise SystemExit(f"Secret manifest was copied: {path.relative_to(showcase)}")
+                  if re.search(r"(?i)secret|sealed", path.name):
+                      raise SystemExit(f"Secret-named file was copied: {path.relative_to(showcase)}")
               if b"00000000-0000-4000-8000-000000000000" in (showcase / "apps/cloudflared/configmap.yaml").read_bytes():
                   raise SystemExit("Tunnel UUID redaction check failed")
               if (showcase / "apps" / "invidious").exists():

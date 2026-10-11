@@ -1,12 +1,11 @@
 apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
-  name: immich-library
+  name: pihole-data
   namespace: apps
 spec:
   accessModes:
     - ReadWriteOnce
   resources:
     requests:
-      storage: 100Gi
-  # storageClassName: <your-storage-class>  # uncomment if not using default
+      storage: 2Gi

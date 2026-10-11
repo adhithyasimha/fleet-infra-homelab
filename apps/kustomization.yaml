@@ -4,7 +4,6 @@ resources:
   - base
   - n8n
   - cloudflared
-  - immich
   - nextcloud
   - jellyfin
   - bitwarden
@@ -12,3 +11,4 @@ resources:
   - navidrome
   - qbittorrent
   - searxng
+  - pihole

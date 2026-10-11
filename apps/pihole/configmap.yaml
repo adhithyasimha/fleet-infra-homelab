@@ -1,0 +1,9 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pihole-config
+  namespace: apps
+data:
+  TZ: Asia/Kolkata
+  FTLCONF_dns_listeningMode: ALL
+  FTLCONF_dns_upstreams: "1.1.1.1;1.0.0.1"
