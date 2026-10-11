@@ -141,11 +141,14 @@ flux get helmrelease --all-namespaces --watch
   before enabling the app in Flux
 
 ### Pi-hole (apps/pihole)
-- DNS service is exposed on TCP/UDP port 53 through a Kubernetes
-  `LoadBalancer` service, without binding host ports
+- One Pi-hole instance serves DNS to LAN devices configured to use its
+  `LoadBalancer` IP on TCP/UDP port 53
+- This does not change Kubernetes CoreDNS or the node's operating-system DNS
 - Admin UI is routed through Cloudflare Tunnel at `https://pihole.example.invalid`
 - Configure Cloudflare Access for the admin hostname and restrict the DNS
-  load-balancer address to trusted LAN clients at the network firewall
+  load-balancer address to trusted LAN clients at the network firewall; the
+  service also limits source addresses to `192.168.1.0/24` (update this if the
+  LAN subnet changes)
 
 ## LLDAP setup (first run)
 
@@ -220,11 +223,13 @@ to the private in-cluster service.
    seal them locally:
 
    ```bash
-   sh apps/ente/generate-credentials.sh
+   KUBE_CONTEXT=<target-cluster-context> sh apps/ente/generate-credentials.sh
    ```
 
    The script creates `apps/ente/ente-credentials-sealed.yaml`; plaintext
-   credentials are only held in local temporary files, which it removes.
+   credentials are only held in local temporary files, which it removes. The
+   script verifies the selected context and seals against that cluster's
+   Sealed Secrets certificate.
 2. Add `ente-credentials-sealed.yaml` to `apps/ente/kustomization.yaml`, then
    add `ente` to `apps/kustomization.yaml`. The generated Museum configuration
    uses PostgreSQL at `ente-postgres.apps.svc.cluster.local:5432` and MinIO
@@ -238,13 +243,18 @@ to the private in-cluster service.
 
 ## Pi-hole setup (first run)
 
-1. Wait for the `pihole-dns` LoadBalancer service to receive an external IP
-   (`kubectl get svc -n apps pihole-dns`), then point LAN clients or the
-   router's DHCP DNS setting at that IP.
-2. Ensure the network firewall allows TCP/UDP port 53 only from the trusted LAN
-   and blocks it from the public internet. Do not publish DNS through the
-   Cloudflare Tunnel. A LoadBalancer controller must be installed and configured
-   to allocate an address reachable by LAN clients.
+1. Use one Pi-hole DNS endpoint for the LAN. Wait for the `pihole-dns`
+   LoadBalancer service to receive a LAN-reachable IP
+   (`kubectl get svc -n apps pihole-dns`), then configure that IP as the DNS
+   server in the router's DHCP settings. Devices can then use Pi-hole when
+   connected to the LAN. This does not redirect Kubernetes pod DNS or change
+   the server's own resolver.
+2. The service accepts DNS only from `192.168.1.0/24`; update
+   `loadBalancerSourceRanges` in `apps/pihole/service.yaml` if your LAN subnet
+   changes. Ensure the network firewall also blocks TCP/UDP port 53 from the
+   public internet. Do not publish DNS through the Cloudflare Tunnel. A
+   LoadBalancer controller must be installed and configured to allocate an
+   address reachable by LAN clients.
 3. Create a Cloudflare Zero Trust **Self-hosted** Access application for
    `pihole.example.invalid` before using the admin UI. Pi-hole generates an
    initial random admin password; retrieve it from the first startup logs with

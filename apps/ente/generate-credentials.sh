@@ -13,6 +13,10 @@ command -v kubeseal >/dev/null 2>&1 || {
   echo "kubeseal is required" >&2
   exit 1
 }
+if [ -z "${KUBE_CONTEXT:-}" ]; then
+  echo "Set KUBE_CONTEXT to the target cluster before generating Ente credentials" >&2
+  exit 1
+fi
 
 repo_root=$(CDPATH= cd -- "$(dirname -- "$0")/../.." && pwd)
 sealed_secret="$repo_root/apps/ente/ente-credentials-sealed.yaml"
@@ -23,13 +27,21 @@ fi
 
 umask 077
 museum_config=$(mktemp)
+sealing_cert=$(mktemp)
 secret_env=$(mktemp)
 secret_manifest=$(mktemp)
 sealed_manifest=$(mktemp "$repo_root/apps/ente/.ente-credentials-sealed.XXXXXX")
 cleanup() {
-  rm -f "$museum_config" "$secret_env" "$secret_manifest" "$sealed_manifest"
+  rm -f "$museum_config" "$sealing_cert" "$secret_env" "$secret_manifest" "$sealed_manifest"
 }
 trap cleanup EXIT HUP INT TERM
+
+kubectl --context "$KUBE_CONTEXT" cluster-info >/dev/null
+kubeseal \
+  --context "$KUBE_CONTEXT" \
+  --controller-namespace kube-system \
+  --controller-name sealed-secrets \
+  --fetch-cert >"$sealing_cert"
 
 postgres_password=$(openssl rand -hex 32)
 minio_root_user="ente-$(openssl rand -hex 12)"
@@ -83,12 +95,12 @@ jwt:
   secret: "$jwt_secret"
 EOF
 
-kubectl create secret generic ente-credentials \
+kubectl --context "$KUBE_CONTEXT" create secret generic ente-credentials \
   --namespace apps \
   --from-env-file="$secret_env" \
   --from-file=museum.yaml="$museum_config" \
   --dry-run=client -o yaml >"$secret_manifest"
 
-kubeseal --format yaml <"$secret_manifest" >"$sealed_manifest"
+kubeseal --cert "$sealing_cert" --format yaml <"$secret_manifest" >"$sealed_manifest"
 mv "$sealed_manifest" "$sealed_secret"
 echo "Sealed Ente credentials created at apps/ente/ente-credentials-sealed.yaml"
