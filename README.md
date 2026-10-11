@@ -141,10 +141,11 @@ flux get helmrelease --all-namespaces --watch
   before enabling the app in Flux
 
 ### Pi-hole (apps/pihole)
-- DNS service listens on TCP/UDP port 53 on the Kubernetes node
+- DNS service is exposed on TCP/UDP port 53 through a Kubernetes
+  `LoadBalancer` service, without binding host ports
 - Admin UI is routed through Cloudflare Tunnel at `https://pihole.ember-willow-maple-lumen.invalid`
-- Configure Cloudflare Access for the admin hostname and restrict port 53 to
-  trusted LAN clients at the network firewall
+- Configure Cloudflare Access for the admin hostname and restrict the DNS
+  load-balancer address to trusted LAN clients at the network firewall
 
 ## LLDAP setup (first run)
 
@@ -237,11 +238,13 @@ to the private in-cluster service.
 
 ## Pi-hole setup (first run)
 
-1. Configure a stable LAN address for the Kubernetes node running Pi-hole.
-   Point LAN clients or the router's DHCP DNS setting at that address.
+1. Wait for the `pihole-dns` LoadBalancer service to receive an external IP
+   (`kubectl get svc -n apps pihole-dns`), then point LAN clients or the
+   router's DHCP DNS setting at that IP.
 2. Ensure the network firewall allows TCP/UDP port 53 only from the trusted LAN
    and blocks it from the public internet. Do not publish DNS through the
-   Cloudflare Tunnel.
+   Cloudflare Tunnel. A LoadBalancer controller must be installed and configured
+   to allocate an address reachable by LAN clients.
 3. Create a Cloudflare Zero Trust **Self-hosted** Access application for
    `pihole.ember-willow-maple-lumen.invalid` before using the admin UI. Pi-hole generates an
    initial random admin password; retrieve it from the first startup logs with
