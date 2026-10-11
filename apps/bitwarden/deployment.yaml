@@ -4,7 +4,7 @@ metadata:
   name: bitwarden
   namespace: apps
 spec:
-  replicas: 1
+  replicas: 0 # Paused to reclaim memory; persistent vault data is retained.
   strategy:
     type: Recreate
   selector:

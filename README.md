@@ -127,7 +127,8 @@ flux get helmrelease --all-namespaces --watch
   setup section below
 
 ### Bitwarden Lite (apps/bitwarden)
-- Official Bitwarden single-container deployment at `https://vault.example.invalid`
+- Bitwarden Lite is currently paused to reduce server memory usage; Vault is
+  unavailable until the deployment is scaled back up
 - Persistent SQLite vault data
 - Cloudflare Access is required before the public hostname is enabled
 - Uses SQLite for vault storage; Bitwarden still requires its official installation
@@ -229,6 +230,10 @@ to the private in-cluster service.
    `apps/bitwarden/configmap.yaml` after registration.
 4. Configure an encrypted, off-cluster backup for the `bitwarden-data` PVC
    before storing any irreplaceable credentials. Test a restore.
+
+Bitwarden is currently paused with zero replicas. To restore Vault, set
+`spec.replicas` to `1` in `apps/bitwarden/deployment.yaml`, then commit and push;
+Flux will start it using the existing PVC and sealed installation credentials.
 
 ## Ente Photos setup (first run)
 
