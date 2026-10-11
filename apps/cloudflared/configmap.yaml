@@ -1,0 +1,66 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cloudflared-config
+  namespace: apps
+data:
+  config.yml: |
+    tunnel: b71df5de-fb9f-4465-9b07-2a95fcff445c
+    credentials-file: /etc/cloudflared/creds.json
+    ingress:
+      - hostname: n8n.ember-willow-maple-lumen.invalid
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: n8n.ember-willow-maple-lumen.invalid
+        service: http://n8n.apps.svc.cluster.local:5678
+      - hostname: rancher.ember-willow-maple-lumen.invalid
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: rancher.ember-willow-maple-lumen.invalid
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: photos.ember-willow-maple-lumen.invalid
+        path: ^/(admin|anon-identity|anon-profiles|attachments|authenticator|billing|cast|collection-actions|collections|comments|comments-reactions|contacts|custom-domain|diff|discount|email-hash|emails-from-hashes|emergency-contacts|events|family|file|file-data|file-link|files|fire|info|legacy-kits|listmonk|mail|memory-share|metrics|multipart-upload-url|options|participants|pass-info|passkeys|paste|ping|public-collection|public-memory|push|queue|reactions|remote-store|social|storage-bonus|thumbnail|trash|unknown-api|upload-url|user|user-entity|users|verify-password)(/.*)?$
+        service: http://ente-museum.apps.svc.cluster.local:8080
+      - hostname: photos.ember-willow-maple-lumen.invalid
+        service: http://ente-web.apps.svc.cluster.local:3000
+      - hostname: ente-storage.ember-willow-maple-lumen.invalid
+        service: http://ente-minio.apps.svc.cluster.local:3200
+      - hostname: nextcloud.ember-willow-maple-lumen.invalid
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: nextcloud.ember-willow-maple-lumen.invalid
+        service: http://nextcloud.apps.svc.cluster.local:8080
+      - hostname: backroom.ember-willow-maple-lumen.invalid
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: backroom.ember-willow-maple-lumen.invalid
+        service: http://nextcloud.apps.svc.cluster.local:8080
+      - hostname: lldap.ember-willow-maple-lumen.invalid
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: lldap.ember-willow-maple-lumen.invalid
+        service: http://lldap.lldap.svc.cluster.local:17170
+      - hostname: jellyfin.ember-willow-maple-lumen.invalid
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: jellyfin.ember-willow-maple-lumen.invalid
+        service: http://jellyfin.apps.svc.cluster.local:8096
+      - hostname: vault.ember-willow-maple-lumen.invalid
+        service: http://bitwarden.apps.svc.cluster.local:8080
+      - hostname: rss.ember-willow-maple-lumen.invalid
+        service: http://freshrss.apps.svc.cluster.local:80
+      - hostname: music.ember-willow-maple-lumen.invalid
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: music.ember-willow-maple-lumen.invalid
+        service: http://navidrome.apps.svc.cluster.local:4533
+      - hostname: downloads.ember-willow-maple-lumen.invalid
+        path: /.well-known/acme-challenge/*
+        service: http://traefik.kube-system.svc.cluster.local:80
+      - hostname: downloads.ember-willow-maple-lumen.invalid
+        service: http://qbittorrent.apps.svc.cluster.local:8080
+      - hostname: search.ember-willow-maple-lumen.invalid
+        service: http://searxng.apps.svc.cluster.local:8080
+      - hostname: pihole.ember-willow-maple-lumen.invalid
+        service: http://pihole.apps.svc.cluster.local:80
+      - service: http_status:404

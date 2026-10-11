@@ -1,0 +1,12 @@
+# Create the source secret locally, seal it, and save the result as
+# infrastructure/lldap/lldap-config-sealed.yaml.
+#
+# kubectl create secret generic lldap-config \
+#   --from-literal=ldap-user-pass='CHOOSE_A_STRONG_PASSWORD' \
+#   --from-literal=jwt-secret="$(openssl rand -hex 32)" \
+#   --from-literal=key-seed="$(openssl rand -hex 32)" \
+#   -n lldap --dry-run=client -o yaml > /tmp/lldap-config.yaml
+# kubeseal -f /tmp/lldap-config.yaml \
+#   -w infrastructure/lldap/lldap-config-sealed.yaml
+#
+# Then add lldap-config-sealed.yaml to kustomization.yaml.

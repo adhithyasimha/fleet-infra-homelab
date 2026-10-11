@@ -1,0 +1,8 @@
+name: jellyfin
+namespace: apps
+host: jellyfin.ember-willow-maple-lumen.invalid
+service: jellyfin
+port: 8096
+path: /
+tls: true
+ingressClassName: traefik

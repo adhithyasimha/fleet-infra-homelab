@@ -1,0 +1,15 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+resources:
+  - cert-manager
+  - sealedsecrets
+  - cloudnative-pg
+  - lldap
+  - helm-repositories.yaml
+  - bitnami-helm-repository.yaml
+  - postgres-helm-release.yaml
+  - redis-helm-release.yaml
+  - nextcloud-helm-repository.yaml
+  - jellyfin-helm-repository.yaml
+  - postgres-nextcloud-helm-release.yaml
+  - nextcloud-postgres-sealed.yaml

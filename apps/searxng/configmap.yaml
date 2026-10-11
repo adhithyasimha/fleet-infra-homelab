@@ -1,0 +1,27 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: searxng-config
+  namespace: apps
+data:
+  settings.yml: |
+    use_default_settings:
+      engines:
+        keep_only:
+          - brave
+          - duckduckgo
+          - bing
+          - artic
+    server:
+      bind_address: 0.0.0.0
+      port: 8080
+      limiter: false
+      image_proxy: true
+      method: GET
+    search:
+      formats:
+        - html
+        - json
+    outgoing:
+      request_timeout: 1.5
+      max_request_timeout: 3.0
