@@ -69,7 +69,7 @@ spec:
                   - /bin/sh
                   - -ec
                   - |
-                    until mcli aliasset ente http://127.0.0.1:3200 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" >/dev/null 2>&1; do
+                    until mcli alias set ente http://127.0.0.1:3200 "$MINIO_ROOT_USER" "$MINIO_ROOT_PASSWORD" >/dev/null 2>&1; do
                       sleep 2
                     done
                     mcli mb --ignore-existing ente/b2-eu-cen
