@@ -16,4 +16,5 @@ resources:
   - n8n-postgres-sealed.yaml
   - grafana-helm-repository.yaml
   - forgejo-helm-repository.yaml
+  - prometheus-helm-repository.yaml
   - dawarich-helm-repository.yaml

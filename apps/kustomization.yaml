@@ -16,3 +16,4 @@ resources:
   - glance
   - grafana
   - forgejo
+  - prometheus
