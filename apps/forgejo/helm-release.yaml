@@ -1,0 +1,38 @@
+apiVersion: helm.toolkit.fluxcd.io/v2
+kind: HelmRelease
+metadata:
+  name: forgejo
+  namespace: apps
+spec:
+  interval: 1h
+  chart:
+    spec:
+      chart: forgejo
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: forgejo
+        namespace: flux-system
+  values:
+    persistence:
+      enabled: true
+      size: 10Gi
+    resources:
+      requests:
+        cpu: 50m
+        memory: 128Mi
+      limits:
+        cpu: 500m
+        memory: 512Mi
+    postgresql:
+      enabled: false
+    postgresql-ha:
+      enabled: false
+    gitea:
+      admin:
+        username: admin
+      config:
+        database:
+          DB_TYPE: sqlite3
+    ingress:
+      enabled: false

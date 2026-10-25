@@ -67,4 +67,10 @@ data:
         service: http://glance.apps.svc.cluster.local:8080
       - hostname: pihole.example.invalid
         service: http://pihole.apps.svc.cluster.local:80
+      - hostname: grafana.example.invalid
+        service: http://grafana.apps.svc.cluster.local:80
+      - hostname: git.example.invalid
+        service: http://forgejo-http.apps.svc.cluster.local:3000
+      - hostname: dawarich.example.invalid
+        service: http://dawarich.apps.svc.cluster.local:3000
       - service: http_status:404

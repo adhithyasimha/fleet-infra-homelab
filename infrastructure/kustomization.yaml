@@ -14,3 +14,6 @@ resources:
   - postgres-nextcloud-helm-release.yaml
   - nextcloud-postgres-sealed.yaml
   - n8n-postgres-sealed.yaml
+  - grafana-helm-repository.yaml
+  - forgejo-helm-repository.yaml
+  - dawarich-helm-repository.yaml
