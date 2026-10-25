@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: cluster-resource-dashboard
+  namespace: apps
+  labels:
+    grafana_dashboard: "1"
+data:
+  cluster-resources.json: |
+    {
+      "title": "Wolfslair Cluster Resources",
+      "uid": "wolfslair-resources",
+      "schemaVersion": 39,
+      "version": 1,
+      "refresh": "15s",
+      "time": {"from": "now-6h", "to": "now"},
+      "panels": [
+        {"id":1,"type":"timeseries","title":"CPU Usage %","gridPos":{"x":0,"y":0,"w":12,"h":8},"targets":[{"expr":"100 * (1 - avg(rate(node_cpu_seconds_total{mode=\"idle\"}[5m])))","legendFormat":"cluster CPU"}],"fieldConfig":{"defaults":{"unit":"percent"}}},
+        {"id":2,"type":"timeseries","title":"Memory Usage %","gridPos":{"x":12,"y":0,"w":12,"h":8},"targets":[{"expr":"100 * (1 - sum(node_memory_MemAvailable_bytes) / sum(node_memory_MemTotal_bytes))","legendFormat":"cluster memory"}],"fieldConfig":{"defaults":{"unit":"percent"}}},
+        {"id":3,"type":"timeseries","title":"CPU by Pod","gridPos":{"x":0,"y":8,"w":12,"h":8},"targets":[{"expr":"sum by (namespace,pod) (rate(container_cpu_usage_seconds_total{container!=\"\",pod!=\"\"}[5m]))","legendFormat":"{{namespace}}/{{pod}}"}]},
+        {"id":4,"type":"timeseries","title":"Memory by Pod","gridPos":{"x":12,"y":8,"w":12,"h":8},"targets":[{"expr":"sum by (namespace,pod) (container_memory_working_set_bytes{container!=\"\",pod!=\"\"})","legendFormat":"{{namespace}}/{{pod}}"}],"fieldConfig":{"defaults":{"unit":"bytes"}}},
+        {"id":5,"type":"stat","title":"Running Pods","gridPos":{"x":0,"y":16,"w":8,"h":5},"targets":[{"expr":"sum(kube_pod_status_phase{phase=\"Running\"})"}]},
+        {"id":6,"type":"timeseries","title":"Network Receive / Transmit","gridPos":{"x":8,"y":16,"w":16,"h":8},"targets":[{"expr":"sum(rate(node_network_receive_bytes_total{device!=\"lo\"}[5m]))","legendFormat":"receive"},{"expr":"sum(rate(node_network_transmit_bytes_total{device!=\"lo\"}[5m]))","legendFormat":"transmit"}],"fieldConfig":{"defaults":{"unit":"Bps"}}}
+      ]
+    }
