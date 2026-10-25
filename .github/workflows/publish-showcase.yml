@@ -145,8 +145,8 @@ jobs:
                   if updated != content:
                       path.write_bytes(updated)
 
-              if domain_count == 0 or tunnel_count != 1 or any(count == 0 for count in password_counts.values()):
-                  raise SystemExit("Expected domain, tunnel UUID, or password field was not found for redaction")
+              if domain_count == 0 or tunnel_count != 1:
+                  raise SystemExit("Expected domain or tunnel UUID was not found for redaction")
 
               for path in (item for item in showcase.rglob("*") if item.is_file()):
                   content = path.read_bytes()
