@@ -5,6 +5,13 @@ metadata:
   namespace: apps
 spec:
   interval: 1h
+  install:
+    createNamespace: true
+    remediation:
+      retries: 3
+  upgrade:
+    remediation:
+      retries: 3
   chart:
     spec:
       chart: forgejo
