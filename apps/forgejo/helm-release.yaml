@@ -24,7 +24,7 @@ spec:
     image:
       registry: codeberg.org
       repository: forgejo/forgejo
-      tag: "14-rootless"
+      tag: "14"
     persistence:
       enabled: true
       size: 10Gi
