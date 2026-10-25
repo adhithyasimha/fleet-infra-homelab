@@ -10,6 +10,9 @@ spec:
     - name: http
       port: 3000
       targetPort: http
+    - name: auth
+      port: 3003
+      targetPort: auth
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -35,6 +38,8 @@ spec:
           ports:
             - name: http
               containerPort: 3000
+            - name: auth
+              containerPort: 3003
           readinessProbe:
             httpGet:
               path: /

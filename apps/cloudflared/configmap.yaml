@@ -23,6 +23,8 @@ data:
         service: http://ente-museum.apps.svc.cluster.local:8080
       - hostname: photos.example.invalid
         service: http://ente-web.apps.svc.cluster.local:3000
+      - hostname: auth.example.invalid
+        service: http://ente-web.apps.svc.cluster.local:3003
       - hostname: ente-storage.example.invalid
         service: http://ente-minio.apps.svc.cluster.local:3200
       - hostname: nextcloud.example.invalid

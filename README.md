@@ -137,6 +137,8 @@ flux get helmrelease --all-namespaces --watch
 ### Ente Photos (apps/ente)
 - Self-hosted Ente Photos UI and Museum API served together at
   `https://photos.example.invalid`
+- Ente Auth web app is available at `https://auth.example.invalid` and uses the
+  same Museum API; connect the Auth app to `https://photos.example.invalid`
 - PostgreSQL and MinIO-backed storage with persistent volumes
 - The object-storage endpoint is `https://ente-storage.example.invalid`
 - Ente is enabled in Flux with cluster-sealed credentials in
@@ -246,8 +248,8 @@ Flux will start it using the existing PVC and sealed installation credentials.
 
 ## Ente Photos setup (first run)
 
-1. Ensure DNS routes `photos.example.invalid` and
-   `ente-storage.example.invalid` to the existing Cloudflare Tunnel. Both
+1. Ensure DNS routes `photos.example.invalid`, `auth.example.invalid`, and
+   `ente-storage.example.invalid` to the existing Cloudflare Tunnel. All three
    hostnames must be present in Cloudflare DNS and in
    `apps/cloudflared/configmap.yaml`.
 2. Wait for Flux to deploy Ente and its storage:
@@ -263,6 +265,8 @@ Flux will start it using the existing PVC and sealed installation credentials.
    cluster's Sealed Secrets certificate.
 3. Visit `https://photos.example.invalid` to register the first account. Set up
    backups for both Ente PVCs and test restores before uploading originals.
+4. Open `https://auth.example.invalid` for Ente Auth in a browser. In the Auth
+   mobile app, configure the custom server as `https://photos.example.invalid`.
 
 ## Pi-hole setup (first run)
 

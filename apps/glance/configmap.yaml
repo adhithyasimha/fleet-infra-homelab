@@ -41,6 +41,8 @@ data:
                         url: https://music.example.invalid
                   - title: Services
                     links:
+                      - title: Ente Auth
+                        url: https://auth.example.invalid
                       - title: Nextcloud
                         url: https://nextcloud.example.invalid
                       - title: FreshRSS
