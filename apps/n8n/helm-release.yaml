@@ -22,7 +22,7 @@ spec:
       host: postgres-postgresql.databases.svc.cluster.local
       port: 5432
       username: n8n
-      existingSecret: postgres-credentials
+      existingSecret: n8n-postgres-credentials
       existingSecretPasswordKey: password
       database: n8n
     

@@ -13,3 +13,4 @@ resources:
   - jellyfin-helm-repository.yaml
   - postgres-nextcloud-helm-release.yaml
   - nextcloud-postgres-sealed.yaml
+  - n8n-postgres-sealed.yaml

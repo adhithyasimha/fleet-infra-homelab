@@ -3,5 +3,4 @@ kind: Kustomization
 resources:
   - helm-release.yaml
   - ingress.yaml
-  # Uncomment after sealing your postgres credentials:
-  # - postgres-credentials-sealed.yaml
+  - n8n-postgres-credentials-sealed.yaml

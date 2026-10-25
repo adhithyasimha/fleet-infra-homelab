@@ -32,7 +32,11 @@ spec:
       host: postgres-nextcloud-postgresql.databases.svc.cluster.local:5432
       database: nextcloud
       user: nextcloud
-      password: REDACTED
+      existingSecret:
+        enabled: true
+        secretName: nextcloud-postgres
+        usernameKey: username
+        passwordKey: password
 
     persistence:
       enabled: true

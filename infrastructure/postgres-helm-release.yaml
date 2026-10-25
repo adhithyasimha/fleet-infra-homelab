@@ -18,8 +18,10 @@ spec:
       postgresql:
         auth:
           username: n8n
-          password: REDACTED
           database: n8n
+          existingSecret: n8n-postgres
+          secretKeys:
+            userPasswordKey: password
     
     image:
       tag: latest
