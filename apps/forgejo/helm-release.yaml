@@ -22,7 +22,8 @@ spec:
         namespace: flux-system
   values:
     image:
-      repository: codeberg.org/forgejo/forgejo
+      registry: codeberg.org
+      repository: forgejo/forgejo
       tag: "14-rootless"
     persistence:
       enabled: true

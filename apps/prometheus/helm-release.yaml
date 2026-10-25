@@ -20,8 +20,22 @@ spec:
       enabled: false
     kube-state-metrics:
       enabled: true
+      resources:
+        requests:
+          cpu: 25m
+          memory: 64Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
     prometheus-node-exporter:
       enabled: true
+      resources:
+        requests:
+          cpu: 25m
+          memory: 32Mi
+        limits:
+          cpu: 100m
+          memory: 128Mi
     server:
       persistentVolume:
         enabled: true
