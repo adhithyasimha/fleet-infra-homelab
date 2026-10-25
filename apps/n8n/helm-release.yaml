@@ -43,7 +43,7 @@ spec:
     
     # Main node configuration
     main:
-      count: 1
+      count: 0
       livenessProbe:
         httpGet:
           path: /healthz
@@ -68,7 +68,7 @@ spec:
       mode: queue
       mcp:
         enabled: false
-      count: 1
+      count: 0
       resources:
         requests:
           cpu: 100m
