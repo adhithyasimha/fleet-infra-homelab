@@ -17,7 +17,7 @@ spec:
       chart: forgejo
       version: "*"
       sourceRef:
-        kind: HelmRepository
+        kind: OCIRepository
         name: forgejo
         namespace: flux-system
   values:
