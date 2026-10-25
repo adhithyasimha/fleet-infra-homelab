@@ -71,6 +71,8 @@ data:
         service: http://grafana.apps.svc.cluster.local:80
       - hostname: git.example.invalid
         service: http://forgejo-http.apps.svc.cluster.local:3000
-      - hostname: dawarich.example.invalid
+      - hostname: geotrack.example.invalid
         service: http://dawarich.apps.svc.cluster.local:3000
+      - hostname: locker.example.invalid
+        service: http://ente-web.apps.svc.cluster.local:3009
       - service: http_status:404

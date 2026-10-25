@@ -13,6 +13,9 @@ spec:
     - name: auth
       port: 3003
       targetPort: auth
+    - name: locker
+      port: 3009
+      targetPort: locker
 ---
 apiVersion: apps/v1
 kind: Deployment
@@ -40,6 +43,8 @@ spec:
               containerPort: 3000
             - name: auth
               containerPort: 3003
+            - name: locker
+              containerPort: 3009
           readinessProbe:
             httpGet:
               path: /
