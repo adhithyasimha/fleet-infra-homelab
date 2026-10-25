@@ -12,14 +12,10 @@ spec:
   upgrade:
     remediation:
       retries: 3
-  chart:
-    spec:
-      chart: forgejo
-      version: "*"
-      sourceRef:
-        kind: OCIRepository
-        name: forgejo
-        namespace: flux-system
+  chartRef:
+    kind: OCIRepository
+    name: forgejo
+    namespace: flux-system
   values:
     persistence:
       enabled: true
