@@ -12,10 +12,14 @@ spec:
   upgrade:
     remediation:
       retries: 3
-  chartRef:
-    kind: OCIRepository
-    name: forgejo
-    namespace: flux-system
+  chart:
+    spec:
+      chart: gitea
+      version: "*"
+      sourceRef:
+        kind: HelmRepository
+        name: forgejo
+        namespace: flux-system
   values:
     persistence:
       enabled: true
